@@ -40,12 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($price <= 0) {
         $error = "Please enter a valid price.";
     } else {
-        mysqli_query($conn, "
-            UPDATE products
-            SET title='$title', description='$desc', price=$price,
-                location='$location', category_id=$cat_id
-            WHERE id=$id
-        ");
+        $stock = max(1, (int)$_POST['stock']);
+// then in the UPDATE:
+mysqli_query($conn, "
+    UPDATE products
+    SET title='$title', description='$desc', price=$price,
+        location='$location', category_id=$cat_id, stock=$stock
+    WHERE id=$id
+");
         $success = "Listing updated successfully.";
         // Refresh product data
         $product = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM products WHERE id=$id"));
@@ -86,6 +88,11 @@ include 'includes/header.php';
             <label for="price">Price (R) *</label>
             <input type="number" id="price" name="price" required min="0.01" step="0.01"
                    value="<?= htmlspecialchars($product['price']) ?>">
+
+<label for="stock">Stock Available *</label>
+<input type="number" id="stock" name="stock" required min="1" step="1"
+       placeholder="e.g. 1"
+       value="<?= htmlspecialchars($product['stock'] ?? '1') ?>">
 
             <label for="location">Location</label>
             <input type="text" id="location" name="location" maxlength="100"

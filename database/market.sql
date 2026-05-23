@@ -1,8 +1,8 @@
 -- ITECA Project Database
 -- Run this in phpMyAdmin
 
-CREATE DATABASE IF NOT EXISTS iteca_project;
-USE iteca_project;
+CREATE DATABASE IF NOT EXISTS mymarket_za;
+USE mymarket_za;
 
 -- Categories table
 CREATE TABLE categories (
@@ -55,3 +55,13 @@ INSERT INTO categories (name) VALUES
 ('Vehicles'),
 ('Services'),
 ('Other');
+
+CREATE TABLE cart (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);

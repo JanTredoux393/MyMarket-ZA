@@ -28,10 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($price <= 0) {
         $error = "Please enter a valid price greater than R0.";
     } else {
-        mysqli_query($conn, "
-            INSERT INTO products (user_id, category_id, title, description, price, location)
-            VALUES ($user_id, $cat_id, '$title', '$desc', $price, '$location')
-        ");
+        $stock = max(1, (int)$_POST['stock']);
+// then in the INSERT:
+mysqli_query($conn, "
+    INSERT INTO products (user_id, category_id, title, description, price, location, stock)
+    VALUES ($user_id, $cat_id, '$title', '$desc', $price, '$location', $stock)
+");
         $new_id = mysqli_insert_id($conn);
         header("Location: product-details.php?id=$new_id");
         exit();
@@ -72,6 +74,11 @@ include 'includes/header.php';
             <input type="number" id="price" name="price" required min="0.01" step="0.01"
                    placeholder="0.00"
                    value="<?= htmlspecialchars($_POST['price'] ?? '') ?>">
+
+            <label for="stock">Stock Available *</label>
+<input type="number" id="stock" name="stock" required min="1" step="1"
+       placeholder="e.g. 1"
+       value="<?= htmlspecialchars($_POST['stock'] ?? '1') ?>">
 
             <label for="location">Location</label>
             <input type="text" id="location" name="location" maxlength="100"
