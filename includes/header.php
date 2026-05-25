@@ -1,7 +1,6 @@
 <?php
 $page_title = isset($page_title) ? $page_title . ' | MyMarket-ZA' : 'MyMarket-ZA';
 
-// Cart count for logged-in users
 $cart_count = 0;
 if (isLoggedIn()) {
     $uid    = currentUserId();
@@ -28,6 +27,11 @@ if (isLoggedIn()) {
             <a href="/MyMarket-ZA/browse.php"
                <?= basename($_SERVER['PHP_SELF']) === 'browse.php' ? 'class="active"' : '' ?>>Browse</a>
 
+            <a href="/MyMarket-ZA/cart.php"
+               <?= basename($_SERVER['PHP_SELF']) === 'cart.php' ? 'class="active"' : '' ?>>
+                🛒 Cart<?php if ($cart_count > 0): ?><span class="cart-badge"><?= $cart_count ?></span><?php endif; ?>
+            </a>
+
             <?php if (isLoggedIn()): ?>
                 <?php if (isSeller()): ?>
                     <a href="/MyMarket-ZA/create-listing.php"
@@ -35,17 +39,12 @@ if (isLoggedIn()) {
                 <?php endif; ?>
                 <a href="/MyMarket-ZA/my-listing.php"
                    <?= basename($_SERVER['PHP_SELF']) === 'my-listing.php' ? 'class="active"' : '' ?>>My Listings</a>
-                <a href="/MyMarket-ZA/cart.php"
-                   <?= basename($_SERVER['PHP_SELF']) === 'cart.php' ? 'class="active"' : '' ?>>
-                    🛒 Cart<?php if ($cart_count > 0): ?><span class="cart-badge"><?= $cart_count ?></span><?php endif; ?>
-                </a>
                 <a href="/MyMarket-ZA/profile.php"
                    <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'class="active"' : '' ?>>My Profile</a>
                 <?php if (isAdmin()): ?>
                     <a href="/MyMarket-ZA/admin/dashboard.php"
                        <?= strpos($_SERVER['PHP_SELF'], 'admin') !== false ? 'class="active"' : '' ?>>Admin</a>
                 <?php endif; ?>
-                <a href="/MyMarket-ZA/logout.php">Logout</a>
             <?php else: ?>
                 <a href="/MyMarket-ZA/login.php"
                    <?= basename($_SERVER['PHP_SELF']) === 'login.php' ? 'class="active"' : '' ?>>Login</a>

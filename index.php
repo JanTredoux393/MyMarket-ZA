@@ -4,8 +4,7 @@ require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-// Fetch latest 8 products for the homepage
-$featured = mysqli_query($conn, "
+$featured   = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
     JOIN users u ON p.user_id = u.id
@@ -13,8 +12,6 @@ $featured = mysqli_query($conn, "
     ORDER BY p.created_at DESC
     LIMIT 8
 ");
-
-// Fetch categories for search dropdown
 $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
 
 $page_title = 'Buy & Sell Near You';
@@ -22,13 +19,10 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* ---- INDEX PAGE ONLY ---- */
-
 .index-hero {
     background: linear-gradient(135deg, #14532d 0%, #166534 60%, #15803d 100%);
     padding: 36px 20px 40px;
     text-align: center;
-    margin-bottom: 0;
 }
 
 .index-hero h2 {
@@ -45,7 +39,6 @@ include 'includes/header.php';
     margin-bottom: 20px;
 }
 
-/* Search bar on hero */
 .hero-search {
     max-width: 680px;
     margin: 0 auto;
@@ -67,14 +60,12 @@ include 'includes/header.php';
     padding: 12px 10px;
     background: #f9fafb;
     color: #374151;
-    cursor: pointer;
     flex-shrink: 0;
 }
 
 .hero-search select:focus {
     outline: none;
     box-shadow: none;
-    border-color: #e5e7eb;
 }
 
 .hero-search input {
@@ -89,7 +80,6 @@ include 'includes/header.php';
 .hero-search input:focus {
     outline: none;
     box-shadow: none;
-    border-color: transparent;
 }
 
 .hero-search button {
@@ -105,11 +95,8 @@ include 'includes/header.php';
     transition: background 0.15s;
 }
 
-.hero-search button:hover {
-    background: #d97706;
-}
+.hero-search button:hover { background: #d97706; }
 
-/* Trust badges row */
 .trust-bar {
     background: #f0fdf4;
     border-bottom: 1px solid #dcfce7;
@@ -134,29 +121,11 @@ include 'includes/header.php';
     color: #15803d;
 }
 
-<?php if (isLoggedIn()): ?>
-<div class="flex-row mb-2" style="margin-top:8px;">
-    <a href="cart.php" class="btn btn-green btn-lg">🛒 My Cart
-        <?php
-        $uid = currentUserId();
-        $cq  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(quantity) AS total FROM cart WHERE user_id=$uid"));
-        $cc  = (int)($cq['total'] ?? 0);
-        if ($cc > 0): ?>
-            <span class="cart-badge"><?= $cc ?></span>
-        <?php endif; ?>
-    </a>
-    <a href="checkout.php" class="btn btn-yellow btn-lg">✅ Checkout</a>
-</div>
-<?php endif; ?>
-
-/* Category pills */
 .category-strip {
-    max-width: 1100px;
-    margin: 24px auto 0;
-    padding: 0 20px;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
 .cat-pill {
@@ -182,7 +151,6 @@ include 'includes/header.php';
     text-decoration: none;
 }
 
-/* Section headings */
 .section-header {
     display: flex;
     align-items: center;
@@ -202,35 +170,6 @@ include 'includes/header.php';
     color: #16a34a;
 }
 
-/* Mini feature strip */
-.mini-features {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-}
-
-.mini-feature {
-    flex: 1;
-    min-width: 140px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: #4b5563;
-    font-weight: 500;
-}
-
-.mini-feature span.icon {
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-/* CTA banner */
 .cta-banner {
     background: linear-gradient(135deg, #14532d, #166534);
     border-radius: 12px;
@@ -252,16 +191,13 @@ include 'includes/header.php';
     margin-bottom: 16px;
 }
 
-.cta-banner .flex-row {
-    justify-content: center;
-}
+.cta-banner .flex-row { justify-content: center; }
 </style>
 
-<!-- Hero with search -->
+<!-- Hero -->
 <div class="index-hero">
     <h2>South Africa's Community Marketplace</h2>
     <p>Buy and sell anything — from clothing to electronics, furniture to services</p>
-
     <form method="GET" action="browse.php">
         <div class="hero-search">
             <select name="category">
@@ -288,9 +224,22 @@ include 'includes/header.php';
 
 <div class="container">
 
+    <!-- Cart/checkout buttons for logged in users -->
+    <?php if (isLoggedIn()): ?>
+    <div class="flex-row mb-2" style="margin-bottom:20px;">
+        <a href="cart.php" class="btn btn-green">
+            🛒 My Cart<?php if ($cart_count > 0): ?> <span class="cart-badge"><?= $cart_count ?></span><?php endif; ?>
+        </a>
+        <a href="checkout.php" class="btn btn-yellow">✅ Checkout</a>
+        <?php if (isSeller()): ?>
+            <a href="create-listing.php" class="btn btn-outline">+ Post a Listing</a>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- Category pills -->
-    <div class="category-strip" style="padding:0;margin-top:20px;margin-bottom:24px;">
-        <a href="browse.php?category=0" class="cat-pill">🏷️ All</a>
+    <div class="category-strip">
+        <a href="browse.php" class="cat-pill">🏷️ All</a>
         <a href="browse.php?category=1" class="cat-pill">👕 Clothing</a>
         <a href="browse.php?category=2" class="cat-pill">📱 Electronics</a>
         <a href="browse.php?category=3" class="cat-pill">🛒 Food</a>
@@ -309,7 +258,7 @@ include 'includes/header.php';
     <?php if (mysqli_num_rows($featured) === 0): ?>
         <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:48px;text-align:center;color:#9ca3af;margin-bottom:32px;">
             <div style="font-size:40px;margin-bottom:12px;">🛍️</div>
-            <p style="font-size:16px;font-weight:600;color:#374151;margin-bottom:6px;">No listings yet</div>
+            <p style="font-size:16px;font-weight:600;color:#374151;margin-bottom:6px;">No listings yet</p>
             <p style="font-size:14px;">Be the first to post something for sale!</p>
             <?php if (isLoggedIn() && isSeller()): ?>
                 <a href="create-listing.php" class="btn btn-green" style="margin-top:16px;">Post a Listing</a>
@@ -340,23 +289,7 @@ include 'includes/header.php';
         </div>
     <?php endif; ?>
 
-    <!-- Mini features -->
-    <div class="mini-features">
-        <div class="mini-feature">
-            <span class="icon">🛒</span> Browse without an account
-        </div>
-        <div class="mini-feature">
-            <span class="icon">📦</span> Post items in minutes
-        </div>
-        <div class="mini-feature">
-            <span class="icon">🤝</span> Contact sellers directly
-        </div>
-        <div class="mini-feature">
-            <span class="icon">📍</span> South Africa focused
-        </div>
-    </div>
-
-    <!-- CTA for guests -->
+    <!-- CTA for guests only -->
     <?php if (!isLoggedIn()): ?>
     <div class="cta-banner">
         <h3>Ready to start selling?</h3>
