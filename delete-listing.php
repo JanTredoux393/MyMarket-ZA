@@ -32,7 +32,7 @@ mysqli_query($conn, "DELETE FROM products WHERE id=$id");
 if (isAdmin() && strpos($_SERVER['HTTP_REFERER'] ?? '', 'admin') !== false) {
     header("Location: admin/products.php?deleted=1");
 } else {
-    header("Location: my-listings.php?deleted=1");
+    header("Location: my-listing.php?deleted=1");
 }
 exit();
 ?>

@@ -127,6 +127,12 @@ include 'includes/header.php';
             <div class="alert alert-success alert-auto-hide"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
+        <!-- Dark mode toggle -->
+<button class="dark-mode-toggle" onclick="toggleDarkMode()">
+    <span>🌙 Dark Mode</span>
+    <span class="toggle-switch"></span>
+</button>
+
         <form method="POST" action="profile.php">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required minlength="3"
@@ -149,6 +155,7 @@ include 'includes/header.php';
                    placeholder="Enter your current password to confirm changes">
 
             <button type="submit" name="update_settings" class="btn btn-green">Save Changes</button>
+            
         </form>
     </div>
     <?php endif; ?>

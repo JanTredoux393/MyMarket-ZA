@@ -69,6 +69,13 @@ include 'includes/header.php';
             <?php while ($p = mysqli_fetch_assoc($products)): ?>
             <div class="product-card">
                 <div>
+
+                <?php if (!empty($p['image'])): ?>
+    <img src="<?= htmlspecialchars($p['image']) ?>"
+         alt="<?= htmlspecialchars($p['title']) ?>"
+         style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+<?php endif; ?>
+
                     <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>
                     <?php if ($p['category_name']): ?>

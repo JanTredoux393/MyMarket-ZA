@@ -9,6 +9,15 @@ if (isLoggedIn()) {
     ));
     $cart_count = (int)($cart_q['total'] ?? 0);
 }
+
+// Load dark mode preference
+$dark_mode = false;
+if (isLoggedIn()) {
+    $dm_user = mysqli_fetch_assoc(mysqli_query($conn,
+        "SELECT dark_mode FROM users WHERE id=$uid"
+    ));
+    $dark_mode = (bool)($dm_user['dark_mode'] ?? false);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +27,7 @@ if (isLoggedIn()) {
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="stylesheet" href="/MyMarket-ZA/css/style.css">
 </head>
-<body>
+<body class="<?= $dark_mode ? 'dark' : '' ?>">
 
 <header>
     <div class="header-inner">

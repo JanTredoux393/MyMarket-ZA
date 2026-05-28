@@ -57,6 +57,13 @@ include 'includes/header.php';
     <?php endif; ?>
 
     <div class="product-detail">
+
+<?php if (!empty($product['image'])): ?>
+    <img src="<?= htmlspecialchars($product['image']) ?>"
+         alt="<?= htmlspecialchars($product['title']) ?>"
+         style="width:100%;max-height:380px;object-fit:cover;border-radius:10px;margin-bottom:20px;">
+<?php endif; ?>
+
         <h2><?= htmlspecialchars($product['title']) ?></h2>
         <div class="price">R <?= number_format($product['price'], 2) ?></div>
 
