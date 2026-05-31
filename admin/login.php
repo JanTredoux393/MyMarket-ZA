@@ -4,7 +4,6 @@ require_once '../config.php';
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 
-// Already logged in as admin
 if (isAdmin()) {
     header("Location: dashboard.php");
     exit();
@@ -43,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <header>
     <div class="header-inner">
         <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
-        <h1>MyMarket<span>-ZA</span> &mdash; Admin Login</h1>
     </div>
 </header>
 
@@ -71,6 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <footer>&copy; <?= date('Y') ?> <?= SITE_NAME ?></footer>
-<script src="../script.js"></script>
+<script src="../js/script.js"></script>
 </body>
 </html>

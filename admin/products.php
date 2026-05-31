@@ -12,7 +12,6 @@ if (isset($_GET['deleted'])) {
     $success = "Listing deleted successfully.";
 }
 
-// Search/filter
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
 $where  = $search ? "WHERE p.title LIKE '%$search%' OR u.username LIKE '%$search%'" : "";
 
@@ -38,14 +37,14 @@ $products = mysqli_query($conn, "
 <header>
     <div class="header-inner">
         <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
+        <nav>
+            <a href="dashboard.php">Dashboard</a>
+            <a href="users.php">Users</a>
+            <a href="products.php" class="active">Listings</a>
+            <a href="../browse.php">View Site</a>
+            <a href="../logout.php">Logout</a>
+        </nav>
     </div>
-    <nav>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="users.php">Users</a>
-        <a href="products.php" class="active">Listings</a>
-        <a href="../browse.php">View Site</a>
-        <a href="../logout.php">Logout</a>
-    </nav>
 </header>
 
 <div class="container">
@@ -55,7 +54,6 @@ $products = mysqli_query($conn, "
         <div class="alert alert-success alert-auto-hide"><?= $success ?></div>
     <?php endif; ?>
 
-    <!-- Search -->
     <form method="GET" action="products.php" style="margin-bottom:16px;">
         <div class="search-bar">
             <input type="text" name="search" placeholder="Search by title or seller..."
@@ -68,7 +66,15 @@ $products = mysqli_query($conn, "
     </form>
 
     <table>
-        <tr><th>ID</th><th>Title</th><th>Seller</th><th>Category</th><th>Price</th><th>Date</th><th>Actions</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Seller</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
         <?php if (mysqli_num_rows($products) === 0): ?>
             <tr><td colspan="7" style="text-align:center;color:#888;">No listings found.</td></tr>
         <?php endif; ?>
@@ -93,6 +99,6 @@ $products = mysqli_query($conn, "
 </div>
 
 <footer>&copy; <?= date('Y') ?> <?= SITE_NAME ?> | Admin Panel</footer>
-<script src="../script.js"></script>
+<script src="../js/script.js"></script>
 </body>
 </html>

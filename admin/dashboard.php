@@ -6,20 +6,16 @@ require_once '../includes/auth.php';
 
 requireAdmin();
 
-// Dashboard counts
 $total_users    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users"))['n'];
 $total_products = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM products"))['n'];
 $total_messages = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM messages"))['n'];
 $total_sellers  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users WHERE role='seller'"))['n'];
 
-// Recent listings
 $recent = mysqli_query($conn, "
     SELECT p.id, p.title, p.price, p.created_at, u.username
     FROM products p JOIN users u ON p.user_id = u.id
     ORDER BY p.created_at DESC LIMIT 5
 ");
-
-$page_title = 'Admin Dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,23 +30,19 @@ $page_title = 'Admin Dashboard';
 <header>
     <div class="header-inner">
         <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
+        <nav>
+            <a href="dashboard.php" class="active">Dashboard</a>
+            <a href="users.php">Users</a>
+            <a href="products.php">Listings</a>
+            <a href="../browse.php">View Site</a>
+            <a href="../logout.php">Logout</a>
+        </nav>
     </div>
 </header>
 
 <div class="container">
     <h2 class="page-title">Dashboard</h2>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-        <a href="../browse.php">View Site</a>
-        <a href="../logout.php">Logout</a>
-    </nav>
-</header>
-
-<div class="container">
-    <h2 class="page-title">Dashboard</h2>
-
-    <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number"><?= $total_users ?></div>
@@ -70,10 +62,15 @@ $page_title = 'Admin Dashboard';
         </div>
     </div>
 
-    <!-- Recent listings -->
-    <h3 style="margin-bottom:12px;color:#1a7a4a;">Recent Listings</h3>
+    <h3 style="margin-bottom:12px;color:var(--green);">Recent Listings</h3>
     <table>
-        <tr><th>Title</th><th>Seller</th><th>Price</th><th>Date</th><th>Action</th></tr>
+        <tr>
+            <th>Title</th>
+            <th>Seller</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
         <?php while ($r = mysqli_fetch_assoc($recent)): ?>
         <tr>
             <td><a href="../product-details.php?id=<?= $r['id'] ?>"><?= htmlspecialchars($r['title']) ?></a></td>
@@ -90,9 +87,7 @@ $page_title = 'Admin Dashboard';
     </table>
 </div>
 
-<footer>
-    &copy; <?= date('Y') ?> <?= SITE_NAME ?> | Admin Panel
-</footer>
-<script src="../script.js"></script>
+<footer>&copy; <?= date('Y') ?> <?= SITE_NAME ?> | Admin Panel</footer>
+<script src="../js/script.js"></script>
 </body>
 </html>
