@@ -7,7 +7,7 @@ require_once 'includes/auth.php';
 $search     = isset($_GET['search'])   ? mysqli_real_escape_string($conn, trim($_GET['search']))  : '';
 $cat_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
 
-$where = "WHERE 1=1";
+$where = "WHERE p.is_sold = 0";
 if ($search !== '')  $where .= " AND (p.title LIKE '%$search%' OR p.description LIKE '%$search%' OR p.location LIKE '%$search%')";
 if ($cat_filter > 0) $where .= " AND p.category_id = $cat_filter";
 

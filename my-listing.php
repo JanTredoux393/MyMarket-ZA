@@ -6,7 +6,15 @@ require_once 'includes/auth.php';
 
 requireLogin();
 
-$user_id  = currentUserId();
+$user_id = currentUserId();
+
+// Handle seller upgrade request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['seller_request'])) {
+    mysqli_query($conn, "UPDATE users SET seller_request=1 WHERE id=$user_id");
+    header("Location: my-listing.php?requested=1");
+    exit();
+}
+
 $listings = mysqli_query($conn, "
     SELECT p.*, c.name AS category_name
     FROM products p
@@ -31,8 +39,18 @@ include 'includes/header.php';
             <a href="create-listing.php" class="btn btn-green">+ Post New Listing</a>
         </div>
     <?php else: ?>
-        <div class="alert alert-info">
-            Your account is set to <strong>buyer</strong> only. <a href="profile.php">Contact support</a> to become a seller.
+        <div class="profile-box">
+            <h3 style="margin-bottom:8px;">Want to sell on MyMarket-ZA?</h3>
+            <p style="margin-bottom:16px;">Your account is currently set to <strong>buyer only</strong>. Submit a request below and an admin will upgrade your account.</p>
+
+            <?php if (isset($_GET['requested'])): ?>
+                <div class="alert alert-success">Request sent! An admin will review and upgrade your account soon.</div>
+            <?php else: ?>
+                <form method="POST" action="my-listing.php">
+                    <input type="hidden" name="seller_request" value="1">
+                    <button type="submit" class="btn btn-green">Request Seller Access</button>
+                </form>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
@@ -44,11 +62,11 @@ include 'includes/header.php';
             <div class="product-card">
                 <div>
 
-<?php if (!empty($p['image'])): ?>
-    <img src="<?= htmlspecialchars($p['image']) ?>"
-         alt="<?= htmlspecialchars($p['title']) ?>"
-         style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
-<?php endif; ?>
+                <?php if (!empty($p['image'])): ?>
+                    <img src="<?= htmlspecialchars($p['image']) ?>"
+                         alt="<?= htmlspecialchars($p['title']) ?>"
+                         style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                <?php endif; ?>
 
                     <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>

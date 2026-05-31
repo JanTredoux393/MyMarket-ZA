@@ -127,24 +127,35 @@ include 'includes/header.php';
         <?php endif; ?>
     </div>
 
-    <!-- Contact form -->
-    <?php if (!isLoggedIn() || currentUserId() !== $product['user_id']): ?>
-    <div class="profile-box">
-        <h3 style="margin-bottom:14px;">Contact the Seller</h3>
-        <form method="POST" action="product-details.php?id=<?= $id ?>">
-            <label for="sender_name">Your Name</label>
-            <input type="text" id="sender_name" name="sender_name" required
-                   value="<?= htmlspecialchars($_POST['sender_name'] ?? '') ?>">
-            <label for="sender_email">Your Email</label>
-            <input type="email" id="sender_email" name="sender_email" required
-                   value="<?= htmlspecialchars($_POST['sender_email'] ?? '') ?>">
-            <label for="message">Message</label>
+    <!-- Contact / Message seller -->
+<?php if (isLoggedIn() && currentUserId() !== $product['user_id']): ?>
+<div class="profile-box">
+    <h3 style="margin-bottom:14px;">💬 Message the Seller</h3>
+
+    <?php if ($product['is_sold']): ?>
+        <div class="alert alert-error">This item has been sold.</div>
+    <?php else: ?>
+        <form method="POST" action="messages.php?product_id=<?= $id ?>&with=<?= $product['seller_id'] ?>">
+            <input type="hidden" name="product_id"  value="<?= $id ?>">
+            <input type="hidden" name="receiver_id" value="<?= $product['seller_id'] ?>">
+            <input type="hidden" name="send_message" value="1">
+            <label for="message">Your Message</label>
             <textarea id="message" name="message"
-                      placeholder="Hi, I am interested in this item..." required></textarea>
-            <button type="submit" name="send_message" class="btn btn-green">Send Message</button>
+                      placeholder="Hi, I'm interested in this item. Is it still available?"
+                      required></textarea>
+            <button type="submit" class="btn btn-green">Send Message</button>
         </form>
-    </div>
+        <p style="font-size:12px;color:var(--gray-400);margin-top:8px;">
+            Messages are private between you and the seller.
+            <a href="messages.php">View all your messages →</a>
+        </p>
     <?php endif; ?>
+</div>
+<?php elseif (!isLoggedIn()): ?>
+<div class="alert alert-info">
+    <a href="login.php">Log in</a> to contact this seller.
+</div>
+<?php endif; ?>
 
     <a href="browse.php" class="btn btn-gray">&larr; Back to Listings</a>
 

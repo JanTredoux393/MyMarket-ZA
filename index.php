@@ -4,11 +4,12 @@ require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-$featured   = mysqli_query($conn, "
+$featured = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
     JOIN users u ON p.user_id = u.id
     LEFT JOIN categories c ON p.category_id = c.id
+    WHERE p.is_sold = 0
     ORDER BY p.created_at DESC
     LIMIT 8
 ");
@@ -237,23 +238,29 @@ include 'includes/header.php';
     </div>
     <?php endif; ?>
 
-    <!-- Category pills -->
-    <div class="category-strip">
-        <a href="browse.php" class="cat-pill">🏷️ All</a>
-        <a href="browse.php?category=1" class="cat-pill">👕 Clothing</a>
-        <a href="browse.php?category=2" class="cat-pill">📱 Electronics</a>
-        <a href="browse.php?category=3" class="cat-pill">🛒 Food</a>
-        <a href="browse.php?category=4" class="cat-pill">🪑 Furniture</a>
-        <a href="browse.php?category=5" class="cat-pill">🔧 Tools</a>
-        <a href="browse.php?category=6" class="cat-pill">🚗 Vehicles</a>
-        <a href="browse.php?category=7" class="cat-pill">💼 Services</a>
-    </div>
-
-    <!-- Latest listings -->
-    <div class="section-header">
-        <h3>Latest Listings</h3>
-        <a href="browse.php">View all &rarr;</a>
-    </div>
+    <!-- Category pills — pulled from database so IDs always match -->
+<div class="category-strip">
+    <a href="browse.php" class="cat-pill">🏷️ All</a>
+    <?php
+    $cat_icons = [
+        'Clothing'         => '👕',
+        'Electronics'      => '📱',
+        'Food & Groceries' => '🛒',
+        'Furniture'        => '🪑',
+        'Tools'            => '🔧',
+        'Vehicles'         => '🚗',
+        'Services'         => '💼',
+        'Other'            => '📦',
+    ];
+    $pills = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
+    while ($pill = mysqli_fetch_assoc($pills)):
+        $icon = $cat_icons[$pill['name']] ?? '🏷️';
+    ?>
+        <a href="browse.php?category=<?= $pill['id'] ?>" class="cat-pill">
+            <?= $icon ?> <?= htmlspecialchars($pill['name']) ?>
+        </a>
+    <?php endwhile; ?>
+</div>
 
     <?php if (mysqli_num_rows($featured) === 0): ?>
         <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:48px;text-align:center;color:#9ca3af;margin-bottom:32px;">
@@ -270,8 +277,13 @@ include 'includes/header.php';
         <div class="product-grid" style="margin-bottom:32px;">
             <?php while ($p = mysqli_fetch_assoc($featured)): ?>
             <div class="product-card" onclick="window.location='product-details.php?id=<?= $p['id'] ?>'">
-                <div>
-                    <h3><?= htmlspecialchars($p['title']) ?></h3>
+    <div>
+        <?php if (!empty($p['image'])): ?>
+            <img src="<?= htmlspecialchars($p['image']) ?>"
+                 alt="<?= htmlspecialchars($p['title']) ?>"
+                 style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+        <?php endif; ?>
+        <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>
                     <?php if ($p['category_name']): ?>
                         <div class="category"><?= htmlspecialchars($p['category_name']) ?></div>

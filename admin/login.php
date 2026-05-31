@@ -36,12 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= SITE_NAME ?> | Admin Login</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
 <header>
-    <h1>MyMarket<span>-ZA</span> &mdash; Admin Login</h1>
+    <div class="header-inner">
+        <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
+        <h1>MyMarket<span>-ZA</span> &mdash; Admin Login</h1>
+    </div>
 </header>
 
 <div class="container">

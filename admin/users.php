@@ -4,17 +4,16 @@ require_once '../config.php';
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 
-
 requireAdmin();
 
 $success = '';
 $error   = '';
 
-// Change role
+// Change role — also clears the seller request flag
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_role'])) {
     $uid  = (int)$_POST['user_id'];
     $role = in_array($_POST['role'], ['admin', 'seller', 'buyer']) ? $_POST['role'] : 'buyer';
-    mysqli_query($conn, "UPDATE users SET role='$role' WHERE id=$uid");
+    mysqli_query($conn, "UPDATE users SET role='$role', seller_request=0 WHERE id=$uid");
     $success = "Role updated successfully.";
 }
 
@@ -37,33 +36,53 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at DESC");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= SITE_NAME ?> | Manage Users</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
 <header>
-    <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
-    <nav>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="users.php" class="active">Users</a>
-        <a href="products.php">Listings</a>
-        <a href="../browse.php">View Site</a>
-        <a href="../logout.php">Logout</a>
-    </nav>
+    <div class="header-inner">
+        <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
+        <nav>
+            <a href="dashboard.php">Dashboard</a>
+            <a href="users.php" class="active">Users</a>
+            <a href="products.php">Listings</a>
+            <a href="../browse.php">View Site</a>
+            <a href="../logout.php">Logout</a>
+        </nav>
+    </div>
 </header>
 
 <div class="container">
     <h2 class="page-title">Manage Users</h2>
 
-    <?php if ($success): ?><div class="alert alert-success alert-auto-hide"><?= $success ?></div><?php endif; ?>
-    <?php if ($error): ?><div class="alert alert-error"><?= $error ?></div><?php endif; ?>
+    <?php if ($success): ?>
+        <div class="alert alert-success alert-auto-hide"><?= htmlspecialchars($success) ?></div>
+    <?php endif; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
     <table>
-        <tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Actions</th>
+        </tr>
         <?php while ($u = mysqli_fetch_assoc($users)): ?>
         <tr>
             <td><?= $u['id'] ?></td>
-            <td><a href="../profile.php?id=<?= $u['id'] ?>"><?= htmlspecialchars($u['username']) ?></a></td>
+            <td>
+                <a href="../profile.php?id=<?= $u['id'] ?>"><?= htmlspecialchars($u['username']) ?></a>
+                <?php if (!empty($u['seller_request']) && $u['seller_request'] == 1): ?>
+                    <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:6px;">
+                        ⭐ Wants to sell
+                    </span>
+                <?php endif; ?>
+            </td>
             <td><?= htmlspecialchars($u['email']) ?></td>
             <td>
                 <form method="POST" action="users.php" style="display:inline-flex;gap:4px;align-items:center;">
@@ -93,6 +112,6 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at DESC");
 </div>
 
 <footer>&copy; <?= date('Y') ?> <?= SITE_NAME ?> | Admin Panel</footer>
-<script src="../script.js"></script>
+<script src="../js/script.js"></script>
 </body>
 </html>

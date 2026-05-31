@@ -32,11 +32,16 @@ $page_title = 'Admin Dashboard';
 <body>
 
 <header>
-    <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
-    <nav>
-        <a href="dashboard.php" class="active">Dashboard</a>
-        <a href="users.php">Users</a>
-        <a href="products.php">Listings</a>
+    <div class="header-inner">
+        <h1><a href="../index.php" style="color:inherit;text-decoration:none;">MyMarket<span>-ZA</span></a> &mdash; Admin</h1>
+    </div>
+</header>
+
+<div class="container">
+    <h2 class="page-title">Dashboard</h2>
+
+    <!-- Stats -->
+    <div class="stats-grid">
         <a href="../browse.php">View Site</a>
         <a href="../logout.php">Logout</a>
     </nav>

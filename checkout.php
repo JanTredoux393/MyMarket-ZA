@@ -41,23 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_order'])) {
     $phone   = trim(mysqli_real_escape_string($conn, $_POST['phone']));
     $address = trim(mysqli_real_escape_string($conn, $_POST['address']));
 
-    if (!$name || !$phone || !$address) {
+    if (!$name || !$address) {
         $error = "Please fill in all fields.";
     } else {
         // Send a message to each seller for each item
-        foreach ($cart_rows as $item) {
-            $msg = "ORDER ENQUIRY from $name (phone: $phone, address: $address): "
-                 . "I would like to buy {$item['quantity']} x {$item['title']} "
-                 . "at R" . number_format($item['price'], 2) . " each "
-                 . "(subtotal: R" . number_format($item['subtotal'], 2) . ").";
-            $msg_escaped = mysqli_real_escape_string($conn, $msg);
-            $email_escaped = mysqli_real_escape_string($conn, $_SESSION['username'] . '@mymarket.co.za');
+foreach ($cart_rows as $item) {
+    $msg = "ORDER ENQUIRY: I would like to buy {$item['quantity']} x {$item['title']} "
+         . "at R" . number_format($item['price'], 2) . " each "
+         . "(subtotal: R" . number_format($item['subtotal'], 2) . "). "
+         . "Please contact me to arrange payment and delivery.";
+    $msg_escaped   = mysqli_real_escape_string($conn, $msg);
+    $seller_id     = (int)$item['seller_id'];
 
-            mysqli_query($conn, "
-                INSERT INTO messages (product_id, sender_name, sender_email, message)
-                VALUES ({$item['product_id']}, '$name', '$email_escaped', '$msg_escaped')
-            ");
-        }
+    mysqli_query($conn, "
+        INSERT INTO messages (product_id, sender_id, receiver_id, message)
+        VALUES ({$item['product_id']}, $user_id, $seller_id, '$msg_escaped')
+    ");
+}
 
         // Clear the cart
         mysqli_query($conn, "DELETE FROM cart WHERE user_id=$user_id");
@@ -77,8 +77,8 @@ include 'includes/header.php';
     <?php if ($success): ?>
         <div class="checkout-success">
             <div style="font-size:52px;margin-bottom:16px;">✅</div>
-            <h3>Order Sent!</h3>
-            <p>Your order enquiry has been sent to the sellers. They will contact you to arrange payment and delivery.</p>
+            <h3>Enquiry Sent!</h3>
+<p>Your order enquiry has been sent to the seller via the messaging system. Check your <a href="messages.php">messages</a> to continue the conversation and arrange meetup and payment directly.</p>
             <p style="font-size:13px;color:var(--gray-400);margin-top:8px;">Check your messages on each product listing for seller replies.</p>
             <div class="flex-row" style="justify-content:center;margin-top:20px;">
                 <a href="browse.php" class="btn btn-green">Continue Shopping</a>
@@ -104,11 +104,11 @@ include 'includes/header.php';
                         <input type="text" id="full_name" name="full_name" required
                                placeholder="Your full name"
                                value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>">
-
+<!-- 
                         <label for="phone">Phone Number</label>
                         <input type="tel" id="phone" name="phone" required
                                placeholder="e.g. 082 123 4567"
-                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
+                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"> -->
 
                         <label for="address">Delivery Address or Area</label>
                         <input type="text" id="address" name="address" required

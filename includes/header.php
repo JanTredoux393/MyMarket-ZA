@@ -1,21 +1,20 @@
 <?php
 $page_title = isset($page_title) ? $page_title . ' | MyMarket-ZA' : 'MyMarket-ZA';
 
-$cart_count = 0;
-if (isLoggedIn()) {
-    $uid    = currentUserId();
-    $cart_q = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT SUM(quantity) AS total FROM cart WHERE user_id=$uid"
-    ));
-    $cart_count = (int)($cart_q['total'] ?? 0);
-}
+$cart_count  = 0;
+$unread_msgs = 0;
+$dark_mode   = false;
 
-// Load dark mode preference
-$dark_mode = false;
 if (isLoggedIn()) {
-    $dm_user = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT dark_mode FROM users WHERE id=$uid"
-    ));
+    $uid = currentUserId();
+
+    $cart_q     = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(quantity) AS total FROM cart WHERE user_id=$uid"));
+    $cart_count = (int)($cart_q['total'] ?? 0);
+
+    $umq         = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM messages WHERE receiver_id=$uid AND is_read=0"));
+    $unread_msgs = (int)($umq['n'] ?? 0);
+
+    $dm_user   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT dark_mode FROM users WHERE id=$uid"));
     $dark_mode = (bool)($dm_user['dark_mode'] ?? false);
 }
 ?>
@@ -42,6 +41,15 @@ if (isLoggedIn()) {
             </a>
 
             <?php if (isLoggedIn()): ?>
+                <a href="/MyMarket-ZA/messages.php"
+                   <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'class="active"' : '' ?>>
+                    💬 Messages
+                    <span class="cart-badge" id="unread-nav-badge"
+                          style="<?= $unread_msgs > 0 ? '' : 'display:none;' ?>">
+                        <?= $unread_msgs ?>
+                    </span>
+                </a>
+
                 <?php if (isSeller()): ?>
                     <a href="/MyMarket-ZA/create-listing.php"
                        class="nav-sell<?= basename($_SERVER['PHP_SELF']) === 'create-listing.php' ? ' active' : '' ?>">+ Sell Item</a>
