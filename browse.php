@@ -4,20 +4,31 @@ require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-$search     = isset($_GET['search'])   ? mysqli_real_escape_string($conn, trim($_GET['search']))  : '';
+$search     = isset($_GET['search'])   ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
 $cat_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+$page       = isset($_GET['page'])     ? max(1, (int)$_GET['page']) : 1;
+$per_page   = 12;
+$offset     = ($page - 1) * $per_page;
 
 $where = "WHERE p.is_sold = 0";
 if ($search !== '')  $where .= " AND (p.title LIKE '%$search%' OR p.description LIKE '%$search%' OR p.location LIKE '%$search%')";
 if ($cat_filter > 0) $where .= " AND p.category_id = $cat_filter";
 
-$products   = mysqli_query($conn, "
+// Count total for pagination
+$total_count = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) AS n FROM products p $where
+"))['n'];
+
+$total_pages = ceil($total_count / $per_page);
+
+$products = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
     JOIN users u ON p.user_id = u.id
     LEFT JOIN categories c ON p.category_id = c.id
     $where
     ORDER BY p.created_at DESC
+    LIMIT $per_page OFFSET $offset
 ");
 $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
 
@@ -41,7 +52,9 @@ include 'includes/header.php';
                     </option>
                 <?php endwhile; ?>
             </select>
-            <button type="submit" class="btn btn-green">Search</button>
+            <button type="submit" class="btn btn-green" style="padding:10px 28px;font-size:15px;font-weight:700;box-shadow:0 2px 8px rgba(22,163,74,0.4);">
+                🔍 Search
+            </button>
             <?php if ($search || $cat_filter): ?>
                 <a href="browse.php" class="btn btn-gray">Clear</a>
             <?php endif; ?>
@@ -94,5 +107,24 @@ include 'includes/header.php';
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Pagination -->
+<?php if ($total_pages > 1): ?>
+<div class="flex-row" style="justify-content:center;margin-top:32px;gap:8px;">
+    <?php if ($page > 1): ?>
+        <a href="browse.php?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>&category=<?= $cat_filter ?>"
+           class="btn btn-gray">&larr; Previous</a>
+    <?php endif; ?>
+
+    <span style="padding:9px 16px;font-size:14px;color:var(--gray-500);font-weight:600;">
+        Page <?= $page ?> of <?= $total_pages ?>
+    </span>
+
+    <?php if ($page < $total_pages): ?>
+        <a href="browse.php?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>&category=<?= $cat_filter ?>"
+           class="btn btn-green">Next &rarr;</a>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
