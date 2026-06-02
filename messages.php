@@ -17,6 +17,15 @@ if (isset($_GET['fetch_only']) && isset($_GET['product_id']) && isset($_GET['wit
     $pid      = (int)$_GET['product_id'];
     $other_id = (int)$_GET['with'];
 
+    // Badge-only mode — returns just the unread count number
+if (isset($_GET['badge_only'])) {
+    $count = mysqli_fetch_assoc(mysqli_query($conn,
+        "SELECT COUNT(*) AS n FROM messages WHERE receiver_id=$user_id AND is_read=0"
+    ))['n'];
+    echo (int)$count;
+    exit();
+}
+
     // Mark messages as read
     mysqli_query($conn, "
         UPDATE messages SET is_read = 1

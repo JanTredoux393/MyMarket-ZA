@@ -6,28 +6,35 @@ require_once 'includes/auth.php';
 
 $search     = isset($_GET['search'])   ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
 $cat_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+$area       = isset($_GET['area'])     ? mysqli_real_escape_string($conn, trim($_GET['area'])) : '';
+$sort       = isset($_GET['sort'])     ? $_GET['sort'] : 'newest';
 $page       = isset($_GET['page'])     ? max(1, (int)$_GET['page']) : 1;
 $per_page   = 12;
 $offset     = ($page - 1) * $per_page;
 
 $where = "WHERE p.is_sold = 0";
-if ($search !== '')  $where .= " AND (p.title LIKE '%$search%' OR p.description LIKE '%$search%' OR p.location LIKE '%$search%')";
+if ($search !== '') $where .= " AND (p.title LIKE '%$search%' OR p.description LIKE '%$search%')";
 if ($cat_filter > 0) $where .= " AND p.category_id = $cat_filter";
+if ($area !== '')    $where .= " AND p.location LIKE '%$area%'";
 
-// Count total for pagination
-$total_count = mysqli_fetch_assoc(mysqli_query($conn, "
-    SELECT COUNT(*) AS n FROM products p $where
-"))['n'];
+$order = match($sort) {
+    'price_asc'  => 'p.price ASC',
+    'price_desc' => 'p.price DESC',
+    default      => 'p.created_at DESC',
+};
 
+$total_count = mysqli_fetch_assoc(mysqli_query($conn,
+    "SELECT COUNT(*) AS n FROM products p $where"
+))['n'];
 $total_pages = ceil($total_count / $per_page);
 
-$products = mysqli_query($conn, "
+$products   = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
     JOIN users u ON p.user_id = u.id
     LEFT JOIN categories c ON p.category_id = c.id
     $where
-    ORDER BY p.created_at DESC
+    ORDER BY $order
     LIMIT $per_page OFFSET $offset
 ");
 $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
@@ -39,12 +46,17 @@ include 'includes/header.php';
 <div class="container">
     <h2 class="page-title">Browse Listings</h2>
 
-    <!-- Search and filter -->
     <form method="GET" action="browse.php">
-        <div class="search-bar">
-            <input type="text" name="search" placeholder="Search products or location..."
-                   value="<?= htmlspecialchars($search) ?>">
-            <select name="category">
+        <div class="search-bar" style="flex-wrap:wrap;gap:8px;">
+            <input type="text" name="search"
+                   placeholder="Search listings..."
+                   value="<?= htmlspecialchars($search) ?>"
+                   style="flex:2;min-width:160px;">
+            <input type="text" name="area"
+                   placeholder="📍 Area / town..."
+                   value="<?= htmlspecialchars($area) ?>"
+                   style="flex:1;min-width:130px;">
+            <select name="category" style="min-width:150px;">
                 <option value="0">All Categories</option>
                 <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
                     <option value="<?= $cat['id'] ?>" <?= $cat_filter == $cat['id'] ? 'selected' : '' ?>>
@@ -52,10 +64,13 @@ include 'includes/header.php';
                     </option>
                 <?php endwhile; ?>
             </select>
-            <button type="submit" class="btn btn-green" style="padding:10px 28px;font-size:15px;font-weight:700;box-shadow:0 2px 8px rgba(22,163,74,0.4);">
-                🔍 Search
-            </button>
-            <?php if ($search || $cat_filter): ?>
+            <select name="sort" style="min-width:170px;">
+                <option value="newest"     <?= $sort==='newest'     ? 'selected':'' ?>>🕐 Newest First</option>
+                <option value="price_asc"  <?= $sort==='price_asc'  ? 'selected':'' ?>>💸 Price: Low to High</option>
+                <option value="price_desc" <?= $sort==='price_desc' ? 'selected':'' ?>>💰 Price: High to Low</option>
+            </select>
+            <button type="submit" class="btn btn-green" style="padding:10px 24px;">🔍 Search</button>
+            <?php if ($search || $cat_filter || $area || $sort !== 'newest'): ?>
                 <a href="browse.php" class="btn btn-gray">Clear</a>
             <?php endif; ?>
         </div>

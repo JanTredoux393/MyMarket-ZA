@@ -127,10 +127,6 @@ include 'includes/header.php';
             <div class="alert alert-success alert-auto-hide"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
-        <!-- Dark mode toggle -->
-<button class="dark-mode-toggle" onclick="toggleDarkMode()">
-    <span>🌙 Dark Mode</span>
-    <span class="toggle-switch"></span>
 </button>
 
         <form method="POST" action="profile.php">

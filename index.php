@@ -13,7 +13,11 @@ $featured   = mysqli_query($conn, "
     ORDER BY p.created_at DESC
     LIMIT 8
 ");
-$categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
+$categories     = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
+$categories_nav = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
+
+$stat_listings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM products WHERE is_sold=0"))['n'];
+$stat_sellers  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users WHERE role IN ('seller','admin')"))['n'];
 
 $page_title = 'Buy & Sell Near You';
 include 'includes/header.php';
@@ -22,335 +26,394 @@ include 'includes/header.php';
 <style>
 
 /* ---- HERO ---- */
-.index-hero {
-    background: linear-gradient(160deg, #052e16 0%, #14532d 60%, #166534 100%);
-    padding: 56px 20px 48px;
-    text-align: center;
-
-    /* Subtle dot-grid texture to break up the flat green */
-    background-image:
-        radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(160deg, #052e16 0%, #14532d 60%, #166534 100%);
-    background-size: 28px 28px, cover;
+.mz-hero {
+    background: linear-gradient(135deg, #14532d 0%, #166534 60%, #15803d 100%);
+    overflow: hidden;
+    position: relative;
+    border-bottom: 3px solid var(--gold);
 }
 
-.index-hero h2 {
-    color: white;
-    font-size: 38px;
+.mz-hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 20px 48px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 40px;
+    align-items: center;
+}
+
+.mz-hero-bg-text {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 200px;
     font-weight: 800;
-    margin-bottom: 10px;
-    letter-spacing: -1.5px;
-    line-height: 1.15;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    letter-spacing: -8px;
 }
 
-.index-hero h2 span {
+.mz-hero-left h1 {
+    font-size: 46px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.08;
+    letter-spacing: -2px;
+    margin-bottom: 14px;
+}
+
+.mz-hero-left h1 em {
+    font-style: normal;
     color: var(--gold);
 }
 
-.index-hero p {
-    color: rgba(255,255,255,0.60);
+.mz-hero-left p {
+    color: rgba(255,255,255,0.6);
     font-size: 15px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    max-width: 380px;
+    line-height: 1.65;
 }
 
-/* ---- HERO SEARCH BAR ---- */
-.hero-search {
-    max-width: 620px;
-    margin: 0 auto;
-    display: flex;
-    gap: 0;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-
-.hero-search select {
-    width: 150px;
-    border: none;
-    border-right: 1px solid #e5e7eb;
-    border-radius: 0;
-    margin-bottom: 0;
-    font-size: 13px;
-    padding: 14px 10px;
-    background: #f9fafb;
-    color: #374151;
-    flex-shrink: 0;
-    font-weight: 600;
-}
-
-.hero-search select:focus { outline: none; box-shadow: none; }
-
-.hero-search input {
-    flex: 1;
-    border: none;
-    border-radius: 0;
-    margin-bottom: 0;
-    font-size: 15px;
-    padding: 14px 16px;
-    color: #111;
-}
-
-.hero-search input:focus { outline: none; box-shadow: none; }
-
-.hero-search button {
-    border-radius: 0 12px 12px 0;
-    padding: 14px 26px;
-    font-size: 14px;
-    font-weight: 700;
-    background: var(--gold);
-    color: #1a1a1a;
-    border: none;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s;
-    letter-spacing: 0.02em;
-}
-
-.hero-search button:hover { background: var(--gold-dark); }
-
-/* ---- TRUST BAR — sits inside the hero now, no gap ---- */
-.trust-bar {
-    margin-top: 24px;
-}
-
-.trust-bar-inner {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    flex-wrap: wrap;
-}
-
-.trust-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.02em;
-}
-
-/* ---- CATEGORY PILLS ---- */
-.category-strip {
+.mz-hero-pills {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 32px;
-    margin-top: 32px;
 }
 
-.cat-pill {
+.mz-hero-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    background: white;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 9999px;
+    gap: 5px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    padding: 5px 13px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+}
+
+.mz-hero-pill strong { color: white; font-weight: 700; }
+
+/* Search card */
+.mz-hero-search {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+}
+
+.mz-hero-search h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #14532d;
+    margin-bottom: 12px;
+}
+
+.mz-hero-search input,
+.mz-hero-search select {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 8px;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    transition: border-color 0.15s;
+}
+
+.mz-hero-search input:focus,
+.mz-hero-search select:focus {
+    outline: none;
+    border-color: var(--green);
+    background: white;
+    box-shadow: none;
+}
+
+.mz-hero-search button {
+    width: 100%;
+    padding: 12px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.mz-hero-search button:hover { background: var(--green-dark); }
+
+/* ---- PAGE BODY ---- */
+.mz-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 20px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+/* ---- SIDEBAR ---- */
+.mz-sidebar h4 {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+.mz-sidebar-cats {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+}
+
+.mz-sidebar-cats li a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--gray-600);
     text-decoration: none;
-    transition: all 0.15s;
-    white-space: nowrap;
-    box-shadow: var(--shadow-sm);
+    transition: background 0.12s, color 0.12s;
 }
 
-.cat-pill:hover {
+.mz-sidebar-cats li a:hover {
     background: var(--green-xlight);
-    border-color: var(--green);
-    color: var(--green);
+    color: var(--green-dark);
     text-decoration: none;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
 }
 
-/* ---- SECTION HEADER ---- */
-.section-header {
+.mz-sidebar-cats li a .cat-icon {
+    width: 26px;
+    height: 26px;
+    background: var(--gray-100);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.mz-sidebar-sell {
+    background: linear-gradient(135deg, #14532d, #166534);
+    color: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.mz-sidebar-sell strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.mz-sidebar-sell p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* ---- LISTINGS ---- */
+.mz-listings-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.section-header h3 {
-    font-size: 20px;
-    font-weight: 800;
+.mz-listings-header h2 {
+    font-size: 19px;
+    font-weight: 700;
     color: var(--gray-900);
     letter-spacing: -0.3px;
 }
 
-.section-header a {
+.mz-listings-header a {
     font-size: 13px;
     font-weight: 600;
     color: var(--green);
 }
 
-/* ---- PRODUCT CARD — image fills the top ---- */
-.product-card .card-image {
-    width: calc(100% + 36px);   /* stretch past the card's 18px padding on each side */
-    margin: -18px -18px 12px -18px;
-    height: 160px;
-    object-fit: cover;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    display: block;
-    background: var(--gray-100); /* placeholder colour while loading */
+/* ---- CARDS ---- */
+.mz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
 }
 
-/* Placeholder shown when there's no image */
-.card-no-image {
-    width: calc(100% + 36px);
-    margin: -18px -18px 12px -18px;
-    height: 100px;
-    background: linear-gradient(135deg, var(--green-xlight), var(--gray-100));
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+.mz-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.18s, box-shadow 0.18s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.mz-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    border-color: var(--gray-300);
+}
+
+.mz-card-img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    display: block;
+}
+
+.mz-card-no-img {
+    width: 100%;
+    height: 80px;
+    background: var(--green-xlight);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-}
-
-/* ---- CTA BANNER ---- */
-.cta-banner {
-    background: linear-gradient(135deg, #052e16, #14532d);
-    border-radius: 16px;
-    padding: 40px 28px;
-    text-align: center;
-    margin-top: 48px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-}
-
-.cta-banner::before {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
-    width: 180px; height: 180px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 50%;
-}
-
-.cta-banner h3 {
-    font-size: 24px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
-    position: relative;
-}
-
-.cta-banner p {
-    font-size: 14px;
-    color: rgba(255,255,255,0.65);
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.cta-banner .flex-row { justify-content: center; position: relative; }
-
-/* ---- STATS STRIP ---- */
-.stats-strip {
-    display: flex;
-    gap: 0;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 32px;
-}
-
-.stats-strip-item {
-    flex: 1;
-    text-align: center;
-    padding: 20px 12px;
-    border-right: 1px solid var(--gray-100);
-}
-
-.stats-strip-item:last-child { border-right: none; }
-
-.stats-strip-number {
     font-size: 26px;
-    font-weight: 800;
-    color: var(--green);
-    letter-spacing: -1px;
-    line-height: 1;
 }
 
-.stats-strip-label {
-    font-size: 11px;
+.mz-card-body {
+    padding: 11px 13px 13px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.mz-card-body h3 {
+    font-size: 13px;
     font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 5px;
+    line-height: 1.35;
+}
+
+.mz-card-price {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: -0.3px;
+    margin-bottom: 5px;
+}
+
+.mz-card-meta {
+    font-size: 11px;
     color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 4px;
+    margin-top: auto;
+    padding-top: 7px;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ---- CTA ---- */
+.mz-cta {
+    background: linear-gradient(135deg, #14532d, #166534);
+    border-radius: 14px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-top: 28px;
+    color: white;
+}
+
+.mz-cta h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 7px;
+    letter-spacing: -0.3px;
+}
+
+.mz-cta p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 18px;
+}
+
+.mz-cta .flex-row { justify-content: center; }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 800px) {
+    .mz-hero-inner { grid-template-columns: 1fr; }
+    .mz-hero-left h1 { font-size: 32px; }
+    .mz-hero-bg-text { display: none; }
+    .mz-body { grid-template-columns: 1fr; }
+    .mz-sidebar { display: none; }
 }
 
 </style>
 
-<!-- Hero — no gap between this and the content below -->
-<div class="index-hero">
-    <h2>Buy &amp; Sell Anything in <span>South Africa</span></h2>
-    <p>The community marketplace for everyday South Africans</p>
+<div class="mz-hero">
+    <div class="mz-hero-bg-text">ZA</div>
+    <div class="mz-hero-inner">
 
-    <form method="GET" action="browse.php">
-        <div class="hero-search">
-            <select name="category">
-                <option value="0">All Categories</option>
-                <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
-                    <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
-            <input type="text" name="search" placeholder="What are you looking for?">
-            <button type="submit">🔍 Search</button>
+        <div class="mz-hero-left">
+            <h1>Buy &amp; sell<br>anything in<br><em>South Africa.</em></h1>
+            <p>A community marketplace for everyday South Africans. No fees, no middlemen — just direct deals.</p>
+            <div class="mz-hero-pills">
+                <span class="mz-hero-pill"><strong><?= $stat_listings ?></strong> live listings</span>
+                <span class="mz-hero-pill"><strong><?= $stat_sellers ?></strong> sellers</span>
+                <span class="mz-hero-pill">✓ Free to use</span>
+            </div>
         </div>
-    </form>
 
-    <div class="trust-bar">
-        <div class="trust-bar-inner">
-            <div class="trust-item">✓ Free to use</div>
-            <div class="trust-item">✓ South Africa only</div>
-            <div class="trust-item">✓ Direct contact</div>
-            <div class="trust-item">✓ No middlemen</div>
+        <div class="mz-hero-search">
+            <h3>Find something today</h3>
+            <form method="GET" action="browse.php">
+                <input type="text" name="search" placeholder="e.g. iPhone, couch, haircut...">
+                <input type="text" name="area"   placeholder="📍 Area / town (optional)">
+                <select name="category">
+                    <option value="0">All Categories</option>
+                    <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
+                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+                <button type="submit">🔍 Search Listings</button>
+            </form>
         </div>
+
     </div>
 </div>
 
-<div class="container">
+<div class="mz-body">
 
-    <?php
-    // Count live stats to show on the homepage — gives it a sense of activity
-    $stat_listings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM products WHERE is_sold=0"))['n'];
-    $stat_sellers  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users WHERE role IN ('seller','admin')"))['n'];
-    $stat_cats     = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM categories"))['n'];
-    ?>
+    <aside class="mz-sidebar">
 
-    <!-- Live stats strip — makes the page feel alive -->
-    <div class="stats-strip">
-        <div class="stats-strip-item">
-            <div class="stats-strip-number"><?= $stat_listings ?></div>
-            <div class="stats-strip-label">Active Listings</div>
+        <?php if (isLoggedIn() && isSeller()): ?>
+        <div class="mz-sidebar-sell">
+            <strong>Got something to sell?</strong>
+            <p>Post a listing for free and reach buyers near you.</p>
+            <a href="create-listing.php" class="btn btn-green"
+               style="width:100%;justify-content:center;font-size:13px;">+ Post a Listing</a>
         </div>
-        <div class="stats-strip-item">
-            <div class="stats-strip-number"><?= $stat_sellers ?></div>
-            <div class="stats-strip-label">Sellers</div>
-        </div>
-        <div class="stats-strip-item">
-            <div class="stats-strip-number"><?= $stat_cats ?></div>
-            <div class="stats-strip-label">Categories</div>
-        </div>
-        <div class="stats-strip-item">
-            <div class="stats-strip-number">0</div>
-            <div class="stats-strip-label">Delivery Areas</div>
-        </div>
-    </div>
+        <?php endif; ?>
 
-    <!-- Category pills -->
-    <div class="category-strip">
-        <a href="browse.php" class="cat-pill">🏷️ All</a>
+        <h4>Categories</h4>
         <?php
         $cat_icons = [
             'Clothing'         => '👕',
@@ -362,80 +425,85 @@ include 'includes/header.php';
             'Services'         => '💼',
             'Other'            => '📦',
         ];
-        $pills = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
-        while ($pill = mysqli_fetch_assoc($pills)):
-            $icon = $cat_icons[$pill['name']] ?? '📦';
         ?>
-            <a href="browse.php?category=<?= $pill['id'] ?>" class="cat-pill">
-                <?= $icon ?> <?= htmlspecialchars($pill['name']) ?>
-            </a>
-        <?php endwhile; ?>
-    </div>
+        <ul class="mz-sidebar-cats">
+            <li>
+                <a href="browse.php">
+                    <span class="cat-icon">🏷️</span> All Listings
+                </a>
+            </li>
+            <?php while ($pill = mysqli_fetch_assoc($categories_nav)):
+                $icon = $cat_icons[$pill['name']] ?? '📦';
+            ?>
+            <li>
+                <a href="browse.php?category=<?= $pill['id'] ?>">
+                    <span class="cat-icon"><?= $icon ?></span>
+                    <?= htmlspecialchars($pill['name']) ?>
+                </a>
+            </li>
+            <?php endwhile; ?>
+        </ul>
 
-    <!-- Latest listings -->
-    <div class="section-header">
-        <h3>🛍️ Latest Listings</h3>
-        <a href="browse.php">View all &rarr;</a>
-    </div>
+    </aside>
 
-    <?php if (mysqli_num_rows($featured) === 0): ?>
-        <div style="background:white;border:1px solid var(--gray-200);border-radius:16px;padding:64px 24px;text-align:center;color:var(--gray-400);margin-bottom:32px;box-shadow:var(--shadow-sm);">
-            <div style="font-size:48px;margin-bottom:16px;">🛍️</div>
-            <p style="font-size:17px;font-weight:700;color:var(--gray-700);margin-bottom:6px;">No listings yet</p>
-            <p style="font-size:14px;margin-bottom:20px;">Be the first to post something for sale!</p>
-            <?php if (isLoggedIn() && isSeller()): ?>
-                <a href="create-listing.php" class="btn btn-green">Post a Listing</a>
-            <?php else: ?>
-                <a href="register.php" class="btn btn-green">Register to Sell</a>
-            <?php endif; ?>
+    <div class="mz-listings">
+
+        <div class="mz-listings-header">
+            <h2>Latest Listings</h2>
+            <a href="browse.php">View all &rarr;</a>
         </div>
-    <?php else: ?>
-        <div class="product-grid" style="margin-bottom:40px;">
-            <?php while ($p = mysqli_fetch_assoc($featured)): ?>
-            <div class="product-card" onclick="window.location='product-details.php?id=<?= $p['id'] ?>'">
-                <div>
+
+        <?php if (mysqli_num_rows($featured) === 0): ?>
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:12px;
+                        padding:48px 24px;text-align:center;color:var(--gray-400);">
+                <div style="font-size:36px;margin-bottom:10px;">🛍️</div>
+                <p style="font-size:15px;font-weight:700;color:var(--gray-700);margin-bottom:5px;">No listings yet</p>
+                <p style="font-size:13px;margin-bottom:14px;">Be the first to post something for sale!</p>
+                <?php if (isLoggedIn() && isSeller()): ?>
+                    <a href="create-listing.php" class="btn btn-green">Post a Listing</a>
+                <?php else: ?>
+                    <a href="register.php" class="btn btn-green">Register to Sell</a>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <div class="mz-grid">
+                <?php while ($p = mysqli_fetch_assoc($featured)): ?>
+                <div class="mz-card" onclick="window.location='product-details.php?id=<?= $p['id'] ?>'">
                     <?php if (!empty($p['image'])): ?>
-                        <!-- Product image fills the top of the card edge to edge -->
-                        <img class="card-image"
+                        <img class="mz-card-img"
                              src="<?= htmlspecialchars($p['image']) ?>"
                              alt="<?= htmlspecialchars($p['title']) ?>">
                     <?php else: ?>
-                        <!-- No image — show a coloured placeholder with a category emoji -->
-                        <div class="card-no-image">
+                        <div class="mz-card-no-img">
                             <?= $cat_icons[$p['category_name']] ?? '🛍️' ?>
                         </div>
                     <?php endif; ?>
-
-                    <h3><?= htmlspecialchars($p['title']) ?></h3>
-                    <div class="price">R <?= number_format($p['price'], 2) ?></div>
-                    <?php if ($p['category_name']): ?>
-                        <div class="category"><?= htmlspecialchars($p['category_name']) ?></div>
-                    <?php endif; ?>
-                    <?php if ($p['location']): ?>
-                        <div class="location">📍 <?= htmlspecialchars($p['location']) ?></div>
-                    <?php endif; ?>
-                    <!-- Shows the seller's actual username, not "buyer" -->
-                    <div class="location">By <?= htmlspecialchars($p['username']) ?></div>
+                    <div class="mz-card-body">
+                        <h3><?= htmlspecialchars($p['title']) ?></h3>
+                        <div class="mz-card-price">R <?= number_format($p['price'], 2) ?></div>
+                        <div class="mz-card-meta">
+                            <span>📍 <?= htmlspecialchars($p['location'] ?: 'SA') ?></span>
+                            <span><?= htmlspecialchars($p['username']) ?></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <a href="product-details.php?id=<?= $p['id'] ?>" class="btn btn-green">View Item</a>
-                </div>
+                <?php endwhile; ?>
             </div>
-            <?php endwhile; ?>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <!-- CTA — only shown to guests who are not logged in -->
-    <?php if (!isLoggedIn()): ?>
-    <div class="cta-banner">
-        <h3>Start selling today</h3>
-        <p>Register free and reach buyers across South Africa in minutes.</p>
-        <div class="flex-row">
-            <a href="register.php" class="btn btn-yellow btn-lg">Register Free</a>
-            <a href="login.php" style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;">Already have an account? Log in →</a>
+        <?php if (!isLoggedIn()): ?>
+        <div class="mz-cta">
+            <h3>Ready to start?</h3>
+            <p>Register free and reach buyers across South Africa in minutes.</p>
+            <div class="flex-row" style="justify-content:center;">
+                <a href="register.php" class="btn btn-yellow btn-lg">Register Free</a>
+                <a href="login.php"
+                   style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;">Log in →</a>
+            </div>
         </div>
+        <?php endif; ?>
+
     </div>
-    <?php endif; ?>
 
 </div>
 
