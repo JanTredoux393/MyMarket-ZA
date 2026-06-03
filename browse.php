@@ -91,29 +91,25 @@ include 'includes/header.php';
             </p>
         </div>
     <?php else: ?>
-        <div class="product-grid">
+        <div class="mz-grid">
             <?php while ($p = mysqli_fetch_assoc($products)): ?>
-            <div class="product-card">
-                <div>
-                    <?php if (!empty($p['image'])): ?>
-                        <img src="<?= htmlspecialchars($p['image']) ?>"
-                             alt="<?= htmlspecialchars($p['title']) ?>"
-                             style="width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:10px;">
-                    <?php endif; ?>
-                    <h3><?= htmlspecialchars($p['title']) ?></h3>
-                    <div class="price">R <?= number_format($p['price'], 2) ?></div>
-                    <?php if ($p['category_name']): ?>
-                        <div class="category"><?= htmlspecialchars($p['category_name']) ?></div>
-                    <?php endif; ?>
-                    <?php if ($p['location']): ?>
-                        <div class="location"><?= htmlspecialchars($p['location']) ?></div>
-                    <?php endif; ?>
-                    <div class="location" style="margin-top:4px;">By: <?= htmlspecialchars($p['username']) ?></div>
-                </div>
-                <div class="card-footer">
-                    <a href="product-details.php?id=<?= $p['id'] ?>" class="btn btn-green">View Item</a>
-                </div>
-            </div>
+            <div class="mz-card" onclick="window.location='product-details.php?id=<?= $p['id'] ?>'">
+    <?php if (!empty($p['image'])): ?>
+        <img class="mz-card-img"
+             src="<?= htmlspecialchars($p['image']) ?>"
+             alt="<?= htmlspecialchars($p['title']) ?>">
+    <?php else: ?>
+        <div class="mz-card-no-img">No image</div>
+    <?php endif; ?>
+    <div class="mz-card-body">
+        <h3><?= htmlspecialchars($p['title']) ?></h3>
+        <div class="mz-card-price">R <?= number_format($p['price'], 2) ?></div>
+        <div class="mz-card-meta">
+            <span><?= htmlspecialchars($p['location'] ?: 'SA') ?></span>
+            <span><?= htmlspecialchars($p['username']) ?></span>
+        </div>
+    </div>
+</div>
             <?php endwhile; ?>
         </div>
     <?php endif; ?>

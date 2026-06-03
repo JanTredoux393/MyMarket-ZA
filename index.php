@@ -124,7 +124,7 @@ include 'includes/header.php';
     font-size: 14px;
     color: var(--gray-600);
     text-decoration: none;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 2px solid rgba(245, 158, 11, 0.8);
     transition: color 0.12s;
 }
 
@@ -134,11 +134,19 @@ include 'includes/header.php';
 }
 
 .mz-sidebar-sell {
-    background: var(--green-xlight);
-    border: 1px solid var(--green-light);
+    background: #d1ffcf;
+    border: 2px solid var(--gold);
     border-radius: 6px;
     padding: 14px;
     margin-bottom: 20px;
+}
+
+.mz-sidebar-sell strong {
+    color: var(--gold);
+}
+
+.mz-sidebar-sell p {
+    color: rgba(255,255,255,0.85);
 }
 
 .mz-sidebar-sell strong {
@@ -256,7 +264,8 @@ include 'includes/header.php';
 .mz-cta {
     margin-top: 28px;
     padding: 24px 20px;
-    background: var(--gray-900);
+    background: #14532d;
+    border: 2px solid var(--gold);
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -286,7 +295,7 @@ include 'includes/header.php';
 
 .mz-cta-actions a.secondary {
     font-size: 13px;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.75);
     font-weight: 600;
 }
 
@@ -298,6 +307,7 @@ include 'includes/header.php';
     .mz-sidebar { display: none; }
     .mz-cta { flex-direction: column; align-items: flex-start; }
 }
+
 </style>
 
 <div class="mz-hero">
@@ -325,7 +335,7 @@ include 'includes/header.php';
         </div>
         <?php endif; ?>
 
-        <h4>Categories</h4>
+        <h3>Categories</h3>
         <ul class="mz-sidebar-cats">
             <li><a href="browse.php">All Listings</a></li>
             <?php while ($cat = mysqli_fetch_assoc($categories_nav)): ?>

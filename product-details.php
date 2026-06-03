@@ -68,16 +68,16 @@ include 'includes/header.php';
         <div class="price">R <?= number_format($product['price'], 2) ?></div>
 
         <div class="meta">
-            <?php if ($product['category_name']): ?>
-                <span>📁 <?= htmlspecialchars($product['category_name']) ?></span>
-            <?php endif; ?>
-            <?php if ($product['location']): ?>
-                <span>📍 <?= htmlspecialchars($product['location']) ?></span>
-            <?php endif; ?>
-            <span>👤 Seller: <a href="profile.php?id=<?= $product['seller_id'] ?>"><?= htmlspecialchars($product['username']) ?></a></span>
-            <span>🗓️ <?= date('d M Y', strtotime($product['created_at'])) ?></span>
-            <span>📦 <?= $product['stock'] ?> available</span>
-        </div>
+    <?php if ($product['category_name']): ?>
+        <span><?= htmlspecialchars($product['category_name']) ?></span>
+    <?php endif; ?>
+    <?php if ($product['location']): ?>
+        <span><?= htmlspecialchars($product['location']) ?></span>
+    <?php endif; ?>
+    <span>Seller: <a href="profile.php?id=<?= $product['seller_id'] ?>"><?= htmlspecialchars($product['username']) ?></a></span>
+    <span><?= date('d M Y', strtotime($product['created_at'])) ?></span>
+    <span><?= $product['stock'] ?> available</span>
+</div>
 
         <?php if ($product['description']): ?>
             <p><?= nl2br(htmlspecialchars($product['description'])) ?></p>
@@ -130,7 +130,7 @@ include 'includes/header.php';
     <!-- Contact / Message seller -->
 <?php if (isLoggedIn() && currentUserId() !== $product['user_id']): ?>
 <div class="profile-box">
-    <h3 style="margin-bottom:14px;">💬 Message the Seller</h3>
+    <h3 style="margin-bottom:14px;">Message the Seller</h3>
 
     <?php if ($product['is_sold']): ?>
         <div class="alert alert-error">This item has been sold.</div>

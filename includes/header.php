@@ -1,5 +1,5 @@
 <?php
-$page_title = isset($page_title) ? $page_title . ' | MyMarket' : 'MyMarket';
+$page_title = isset($page_title) ? $page_title . ' | MyMarket-ZA' : 'MyMarket-ZA';
 
 $cart_count  = 0;
 $unread_msgs = 0;
@@ -26,7 +26,7 @@ if (isLoggedIn()) {
 
 <header>
     <div class="header-inner">
-        <h1><a href="/MyMarket-ZA/index.php">My<span>Market</span></a></h1>
+        <h1><a href="index.php">My<span>Market</span><span style="color:var(--gold);">-ZA</span></a></h1>
         <nav>
             <a href="/MyMarket-ZA/browse.php"
                <?= basename($_SERVER['PHP_SELF']) === 'browse.php' ? 'class="active"' : '' ?>>Browse</a>

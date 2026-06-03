@@ -94,10 +94,10 @@ include 'includes/header.php';
             <span class="role-badge role-<?= $user['role'] ?>"><?= ucfirst($user['role']) ?></span>
         </h2>
         <?php if ($is_own): ?>
-            <p>📧 <?= htmlspecialchars($user['email']) ?></p>
+            <p><?= htmlspecialchars($user['email']) ?></p>
         <?php endif; ?>
-        <p>📅 Member since: <?= date('d F Y', strtotime($user['created_at'])) ?></p>
-        <p>📦 Active listings: <?= $listing_count ?></p>
+        <p>Member since <?= date('d F Y', strtotime($user['created_at'])) ?></p>
+<p><?= $listing_count ?> active listing<?= $listing_count !== 1 ? 's' : '' ?></p>
 
         <?php if ($is_own): ?>
         <div class="flex-row" style="margin-top:16px;">
@@ -181,7 +181,7 @@ include 'includes/header.php';
                     <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>
                     <?php if ($p['location']): ?>
-                        <div class="location">📍 <?= htmlspecialchars($p['location']) ?></div>
+                        <div class="location"><?= htmlspecialchars($p['location']) ?></div>
                     <?php endif; ?>
                 </div>
                 <div class="card-footer">
