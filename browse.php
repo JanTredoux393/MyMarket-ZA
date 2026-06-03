@@ -53,7 +53,7 @@ include 'includes/header.php';
                    value="<?= htmlspecialchars($search) ?>"
                    style="flex:2;min-width:160px;">
             <input type="text" name="area"
-                   placeholder="📍 Area / town..."
+                   placeholder="Area / town..."
                    value="<?= htmlspecialchars($area) ?>"
                    style="flex:1;min-width:130px;">
             <select name="category" style="min-width:150px;">
@@ -65,25 +65,23 @@ include 'includes/header.php';
                 <?php endwhile; ?>
             </select>
             <select name="sort" style="min-width:170px;">
-                <option value="newest"     <?= $sort==='newest'     ? 'selected':'' ?>>🕐 Newest First</option>
-                <option value="price_asc"  <?= $sort==='price_asc'  ? 'selected':'' ?>>💸 Price: Low to High</option>
-                <option value="price_desc" <?= $sort==='price_desc' ? 'selected':'' ?>>💰 Price: High to Low</option>
+                <option value="newest"     <?= $sort==='newest'     ? 'selected':'' ?>>Newest First</option>
+                <option value="price_asc"  <?= $sort==='price_asc'  ? 'selected':'' ?>>Price: Low to High</option>
+                <option value="price_desc" <?= $sort==='price_desc' ? 'selected':'' ?>>Price: High to Low</option>
             </select>
-            <button type="submit" class="btn btn-green" style="padding:10px 24px;">🔍 Search</button>
+            <button type="submit" class="btn btn-green" style="padding:10px 24px;">Search</button>
             <?php if ($search || $cat_filter || $area || $sort !== 'newest'): ?>
                 <a href="browse.php" class="btn btn-gray">Clear</a>
             <?php endif; ?>
         </div>
     </form>
 
-    <!-- Results count -->
     <?php $count = mysqli_num_rows($products); ?>
     <p style="font-size:14px;color:#888;margin-bottom:12px;">
         <?= $count ?> listing<?= $count !== 1 ? 's' : '' ?> found
         <?= $search ? ' for "' . htmlspecialchars($search) . '"' : '' ?>
     </p>
 
-    <!-- Product grid -->
     <?php if ($count === 0): ?>
         <div class="no-results">
             <p>No listings found.
@@ -97,20 +95,18 @@ include 'includes/header.php';
             <?php while ($p = mysqli_fetch_assoc($products)): ?>
             <div class="product-card">
                 <div>
-
-                <?php if (!empty($p['image'])): ?>
-    <img src="<?= htmlspecialchars($p['image']) ?>"
-         alt="<?= htmlspecialchars($p['title']) ?>"
-         style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
-<?php endif; ?>
-
+                    <?php if (!empty($p['image'])): ?>
+                        <img src="<?= htmlspecialchars($p['image']) ?>"
+                             alt="<?= htmlspecialchars($p['title']) ?>"
+                             style="width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:10px;">
+                    <?php endif; ?>
                     <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>
                     <?php if ($p['category_name']): ?>
                         <div class="category"><?= htmlspecialchars($p['category_name']) ?></div>
                     <?php endif; ?>
                     <?php if ($p['location']): ?>
-                        <div class="location">📍 <?= htmlspecialchars($p['location']) ?></div>
+                        <div class="location"><?= htmlspecialchars($p['location']) ?></div>
                     <?php endif; ?>
                     <div class="location" style="margin-top:4px;">By: <?= htmlspecialchars($p['username']) ?></div>
                 </div>
@@ -123,7 +119,6 @@ include 'includes/header.php';
     <?php endif; ?>
 </div>
 
-<!-- Pagination -->
 <?php if ($total_pages > 1): ?>
 <div class="flex-row" style="justify-content:center;margin-top:32px;gap:8px;">
     <?php if ($page > 1): ?>

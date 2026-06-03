@@ -1,9 +1,8 @@
 <?php
-$page_title = isset($page_title) ? $page_title . ' | MyMarket-ZA' : 'MyMarket-ZA';
+$page_title = isset($page_title) ? $page_title . ' | MyMarket' : 'MyMarket';
 
 $cart_count  = 0;
 $unread_msgs = 0;
-$dark_mode   = false;
 
 if (isLoggedIn()) {
     $uid = currentUserId();
@@ -13,9 +12,6 @@ if (isLoggedIn()) {
 
     $umq         = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM messages WHERE receiver_id=$uid AND is_read=0"));
     $unread_msgs = (int)($umq['n'] ?? 0);
-
-    $dm_user   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT dark_mode FROM users WHERE id=$uid"));
-    $dark_mode = (bool)($dm_user['dark_mode'] ?? false);
 }
 ?>
 <!DOCTYPE html>
@@ -26,11 +22,11 @@ if (isLoggedIn()) {
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="stylesheet" href="/MyMarket-ZA/css/style.css">
 </head>
-<body class="<?= $dark_mode ? 'dark' : '' ?>">
+<body>
 
 <header>
     <div class="header-inner">
-        <h1><a href="/MyMarket-ZA/index.php">MyMarket<span>-ZA</span></a></h1>
+        <h1><a href="/MyMarket-ZA/index.php">My<span>Market</span></a></h1>
         <nav>
             <a href="/MyMarket-ZA/browse.php"
                <?= basename($_SERVER['PHP_SELF']) === 'browse.php' ? 'class="active"' : '' ?>>Browse</a>
@@ -38,7 +34,7 @@ if (isLoggedIn()) {
             <?php if (!isAdmin()): ?>
             <a href="/MyMarket-ZA/cart.php"
                <?= basename($_SERVER['PHP_SELF']) === 'cart.php' ? 'class="active"' : '' ?>>
-                🛒 Cart<?php if ($cart_count > 0): ?><span class="cart-badge"><?= $cart_count ?></span><?php endif; ?>
+                Cart<?php if ($cart_count > 0): ?><span class="cart-badge"><?= $cart_count ?></span><?php endif; ?>
             </a>
             <?php endif; ?>
 
@@ -47,30 +43,32 @@ if (isLoggedIn()) {
                     <a href="/MyMarket-ZA/admin/dashboard.php">Admin Panel</a>
                     <a href="/MyMarket-ZA/messages.php"
                        <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'class="active"' : '' ?>>
-                        💬 Messages
-                        <span class="cart-badge" id="unread-nav-badge"
-                              style="<?= $unread_msgs > 0 ? '' : 'display:none;' ?>">
-                            <?= $unread_msgs ?>
-                        </span>
+                        Messages
+                        <?php if ($unread_msgs > 0): ?>
+                            <span class="cart-badge" id="unread-nav-badge"><?= $unread_msgs ?></span>
+                        <?php else: ?>
+                            <span class="cart-badge" id="unread-nav-badge" style="display:none;">0</span>
+                        <?php endif; ?>
                     </a>
                     <a href="/MyMarket-ZA/logout.php">Logout</a>
                 <?php else: ?>
                     <a href="/MyMarket-ZA/messages.php"
                        <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'class="active"' : '' ?>>
-                        💬 Messages
-                        <span class="cart-badge" id="unread-nav-badge"
-                              style="<?= $unread_msgs > 0 ? '' : 'display:none;' ?>">
-                            <?= $unread_msgs ?>
-                        </span>
+                        Messages
+                        <?php if ($unread_msgs > 0): ?>
+                            <span class="cart-badge" id="unread-nav-badge"><?= $unread_msgs ?></span>
+                        <?php else: ?>
+                            <span class="cart-badge" id="unread-nav-badge" style="display:none;">0</span>
+                        <?php endif; ?>
                     </a>
                     <?php if (isSeller()): ?>
                         <a href="/MyMarket-ZA/create-listing.php"
-                           class="nav-sell<?= basename($_SERVER['PHP_SELF']) === 'create-listing.php' ? ' active' : '' ?>">+ Sell Item</a>
+                           class="nav-sell<?= basename($_SERVER['PHP_SELF']) === 'create-listing.php' ? ' active' : '' ?>">+ Sell</a>
                     <?php endif; ?>
                     <a href="/MyMarket-ZA/my-listing.php"
                        <?= basename($_SERVER['PHP_SELF']) === 'my-listing.php' ? 'class="active"' : '' ?>>My Listings</a>
                     <a href="/MyMarket-ZA/profile.php"
-                       <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'class="active"' : '' ?>>My Profile</a>
+                       <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'class="active"' : '' ?>>Profile</a>
                 <?php endif; ?>
             <?php else: ?>
                 <a href="/MyMarket-ZA/login.php"
@@ -84,8 +82,6 @@ if (isLoggedIn()) {
 
 <?php if (isLoggedIn()): ?>
 <script>
-// Poll for new unread messages every 8 seconds and update the nav badge
-// Skips polling if the user is already on the messages page
 (function () {
     if (window.location.pathname.indexOf('messages.php') !== -1) return;
 
@@ -99,7 +95,7 @@ if (isLoggedIn()) {
                 badge.textContent = n;
                 badge.style.display = n > 0 ? 'inline-flex' : 'none';
             })
-            .catch(function () { /* silently ignore network errors */ });
+            .catch(function () {});
     }
 
     setInterval(refreshUnreadBadge, 8000);

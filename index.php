@@ -1,15 +1,10 @@
-<?php /* decided to use php instead of html due to it being better for web based e-commerce sites. And I mean that is what MyMarket-ZA is.
-/* Started adding these comments as I started. So much to learn about php, javaScript, css and all that. Hopefully helps someone else also, and well me when I go through it all again (btw, YouTube is AWESOME as a tool to learn)
-/* (and well CoPilot is pretty cool with also just simply making comments and explaining things)m */
-session_start(); 
-
-/* these reference other files, which is so much better than having everything in one */
+<?php
+session_start();
 require_once 'config.php';
-require_once 'includes/db.php'; /* important to connect to database... which is obviously important, otherwise no database access */
-require_once 'includes/auth.php'; /* security features and stuff can be found here, and login and so on. */
+require_once 'includes/db.php';
+require_once 'includes/auth.php';
 
-/* main landing page */
-$featured   = mysqli_query($conn, "
+$featured = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
     JOIN users u ON p.user_id = u.id
@@ -18,138 +13,75 @@ $featured   = mysqli_query($conn, "
     ORDER BY p.created_at DESC
     LIMIT 8
 ");
-$categories     = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
 $categories_nav = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
-
-$stat_listings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM products WHERE is_sold=0"))['n'];
-$stat_sellers  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users WHERE role IN ('seller','admin')"))['n'];
 
 $page_title = 'Buy & Sell Near You';
 include 'includes/header.php';
 ?>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap');
 
-/* ---- HERO ---- */
 .mz-hero {
-    background: linear-gradient(135deg, #14532d 0%, #166534 60%, #15803d 100%);
-    overflow: hidden;
-    position: relative;
-    border-bottom: 3px solid var(--gold);
+    background: #14532d;
+    border-bottom: 4px solid var(--gold);
+    padding: 44px 20px 40px;
 }
 
 .mz-hero-inner {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 52px 20px 48px;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 40px;
-    align-items: center;
 }
 
-.mz-hero-bg-text {
-    position: absolute;
-    right: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 200px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.04);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-    white-space: nowrap;
-    letter-spacing: -8px;
-}
-
-.mz-hero-left h1 {
-    font-size: 46px;
+.mz-hero h1 {
+    font-family: 'Barlow Condensed', 'Inter', sans-serif;
+    font-size: 72px;
     font-weight: 800;
     color: white;
-    line-height: 1.08;
-    letter-spacing: -2px;
+    line-height: 0.95;
+    letter-spacing: -1px;
     margin-bottom: 14px;
+    text-transform: uppercase;
 }
 
-.mz-hero-left h1 em {
-    font-style: normal;
+.mz-hero h1 em {
+    font-style: italic;
     color: var(--gold);
 }
 
-.mz-hero-left p {
-    color: rgba(255,255,255,0.6);
+.mz-hero p {
+    color: rgba(255,255,255,0.55);
     font-size: 15px;
     margin-bottom: 24px;
-    max-width: 380px;
-    line-height: 1.65;
+    max-width: 420px;
+    line-height: 1.6;
 }
 
-.mz-hero-pills {
+.mz-hero-searchbar {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    max-width: 480px;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2);
 }
 
-.mz-hero-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 999px;
-    padding: 5px 13px;
-    font-size: 13px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.75);
-}
-
-.mz-hero-pill strong { color: white; font-weight: 700; }
-
-/* Search card */
-.mz-hero-search {
-    background: white;
-    border-radius: 14px;
-    padding: 22px;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
-}
-
-.mz-hero-search h3 {
-    font-size: 14px;
-    font-weight: 700;
-    color: #14532d;
-    margin-bottom: 12px;
-}
-
-.mz-hero-search input,
-.mz-hero-search select {
-    width: 100%;
-    padding: 10px 13px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    margin-bottom: 8px;
-    background: var(--gray-50);
-    color: var(--gray-800);
-    transition: border-color 0.15s;
-}
-
-.mz-hero-search input:focus,
-.mz-hero-search select:focus {
-    outline: none;
-    border-color: var(--green);
-    background: white;
-    box-shadow: none;
-}
-
-.mz-hero-search button {
-    width: 100%;
-    padding: 12px;
-    background: var(--green);
-    color: white;
+.mz-hero-searchbar input {
+    flex: 1;
+    padding: 12px 15px;
     border: none;
-    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    color: var(--gray-800);
+    background: white;
+    margin-bottom: 0;
+}
+
+.mz-hero-searchbar button {
+    padding: 12px 18px;
+    background: var(--gold);
+    color: #1a1a1a;
+    border: none;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -157,133 +89,118 @@ include 'includes/header.php';
     transition: background 0.15s;
 }
 
-.mz-hero-search button:hover { background: var(--green-dark); }
+.mz-hero-searchbar button:hover { background: var(--gold-dark); }
 
-/* ---- PAGE BODY ---- */
+/* Body layout */
 .mz-body {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 36px 20px;
+    padding: 32px 20px;
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 175px 1fr;
     gap: 32px;
     align-items: start;
 }
 
-/* --SIDEBAR-- */
+/* Sidebar */
 .mz-sidebar h4 {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     color: var(--gray-400);
     margin-bottom: 8px;
-    padding-left: 4px;
 }
 
 .mz-sidebar-cats {
     list-style: none;
     padding: 0;
-    margin: 0 0 24px 0;
+    margin: 0 0 20px 0;
 }
 
 .mz-sidebar-cats li a {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
+    display: block;
+    padding: 6px 0;
+    font-size: 14px;
     color: var(--gray-600);
     text-decoration: none;
-    transition: background 0.12s, color 0.12s;
+    border-bottom: 1px solid var(--gray-100);
+    transition: color 0.12s;
 }
 
 .mz-sidebar-cats li a:hover {
-    background: var(--green-xlight);
-    color: var(--green-dark);
+    color: var(--green);
     text-decoration: none;
 }
 
-.mz-sidebar-cats li a .cat-icon {
-    width: 26px;
-    height: 26px;
-    background: var(--gray-100);
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-}
-
 .mz-sidebar-sell {
-    background: linear-gradient(135deg, #14532d, #166534);
-    color: white;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    margin-bottom: 24px;
+    background: var(--green-xlight);
+    border: 1px solid var(--green-light);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 20px;
 }
 
 .mz-sidebar-sell strong {
     display: block;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    color: white;
-    margin-bottom: 5px;
+    color: var(--green-dark);
+    margin-bottom: 6px;
 }
 
 .mz-sidebar-sell p {
     font-size: 12px;
-    color: rgba(255,255,255,0.6);
+    color: var(--gray-500);
     margin-bottom: 10px;
     line-height: 1.5;
 }
 
-/* ---- LISTINGS ---- */
+/* Listings header */
 .mz-listings-header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--gray-900);
+    padding-bottom: 8px;
 }
 
 .mz-listings-header h2 {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--gray-900);
-    letter-spacing: -0.3px;
 }
 
 .mz-listings-header a {
     font-size: 13px;
-    font-weight: 600;
     color: var(--green);
+    font-weight: 600;
 }
 
-/* ---- CARDS ---- */
+.mz-listings-header a:hover { color: var(--green-dark); text-decoration: underline; }
+
+/* Cards */
 .mz-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 12px;
 }
 
 .mz-card {
     background: white;
     border: 1px solid var(--gray-200);
-    border-radius: 12px;
+    border-radius: 5px;
     overflow: hidden;
-    transition: transform 0.18s, box-shadow 0.18s;
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
 
 .mz-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.09);
     border-color: var(--gray-300);
 }
 
@@ -297,15 +214,16 @@ include 'includes/header.php';
 .mz-card-no-img {
     width: 100%;
     height: 80px;
-    background: var(--green-xlight);
+    background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 12px;
+    color: var(--gray-400);
 }
 
 .mz-card-body {
-    padding: 11px 13px 13px;
+    padding: 10px 11px 12px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -315,93 +233,83 @@ include 'includes/header.php';
     font-size: 13px;
     font-weight: 600;
     color: var(--gray-900);
-    margin-bottom: 5px;
-    line-height: 1.35;
+    margin-bottom: 4px;
+    line-height: 1.3;
 }
 
 .mz-card-price {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--green);
-    letter-spacing: -0.3px;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .mz-card-meta {
     font-size: 11px;
     color: var(--gray-400);
     margin-top: auto;
-    padding-top: 7px;
-    border-top: 1px solid var(--gray-100);
     display: flex;
     justify-content: space-between;
 }
 
-/* ---- CTA ---- */
+/* CTA */
 .mz-cta {
-    background: linear-gradient(135deg, #14532d, #166534);
-    border-radius: 14px;
-    padding: 32px 24px;
-    text-align: center;
     margin-top: 28px;
-    color: white;
+    padding: 24px 20px;
+    background: var(--gray-900);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.mz-cta h3 {
-    font-size: 20px;
+.mz-cta-text h3 {
+    font-size: 17px;
     font-weight: 700;
-    margin-bottom: 7px;
-    letter-spacing: -0.3px;
+    color: white;
+    margin-bottom: 4px;
 }
 
-.mz-cta p {
+.mz-cta-text p {
     font-size: 13px;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 18px;
+    color: rgba(255,255,255,0.45);
 }
 
-.mz-cta .flex-row { justify-content: center; }
+.mz-cta-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
 
-/* ---- RESPONSIVE ---- */
+.mz-cta-actions a.secondary {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 600;
+}
+
+/* Responsive */
 @media (max-width: 800px) {
-    .mz-hero-inner { grid-template-columns: 1fr; }
-    .mz-hero-left h1 { font-size: 32px; }
-    .mz-hero-bg-text { display: none; }
+    .mz-hero h1 { font-size: 48px; }
+    .mz-hero-searchbar { max-width: 100%; }
     .mz-body { grid-template-columns: 1fr; }
     .mz-sidebar { display: none; }
+    .mz-cta { flex-direction: column; align-items: flex-start; }
 }
-
 </style>
 
 <div class="mz-hero">
-    <div class="mz-hero-bg-text">ZA</div>
     <div class="mz-hero-inner">
-
-        <div class="mz-hero-left">
-            <h1>Buy &amp; sell<br>anything in<br><em>South Africa.</em></h1>
-            <p>A community marketplace for everyday South Africans. No fees, no middlemen — just direct deals.</p>
-            <div class="mz-hero-pills">
-                <span class="mz-hero-pill"><strong><?= $stat_listings ?></strong> live listings</span>
-                <span class="mz-hero-pill"><strong><?= $stat_sellers ?></strong> sellers</span>
-                <span class="mz-hero-pill">✓ Free to use</span>
+        <h1>Buy &amp; sell<br><em>anything.</em></h1>
+        <p>A community marketplace for South Africans. No fees, no middlemen — direct deals between real people.</p>
+        <form method="GET" action="browse.php" style="margin:0;">
+            <div class="mz-hero-searchbar">
+                <input type="text" name="search" placeholder="What are you looking for?">
+                <button type="submit">Search</button>
             </div>
-        </div>
-
-        <div class="mz-hero-search">
-            <h3>Find something today</h3>
-            <form method="GET" action="browse.php">
-                <input type="text" name="search" placeholder="e.g. iPhone, couch, haircut...">
-                <input type="text" name="area"   placeholder="📍 Area / town (optional)">
-                <select name="category">
-                    <option value="0">All Categories</option>
-                    <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
-                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-                <button type="submit">🔍 Search Listings</button>
-            </form>
-        </div>
-
+        </form>
     </div>
 </div>
 
@@ -412,38 +320,18 @@ include 'includes/header.php';
         <?php if (isLoggedIn() && isSeller()): ?>
         <div class="mz-sidebar-sell">
             <strong>Got something to sell?</strong>
-            <p>Post a listing for free and reach buyers near you.</p>
-            <a href="create-listing.php" class="btn btn-green"
-               style="width:100%;justify-content:center;font-size:13px;">+ Post a Listing</a>
+            <p>Post a listing for free.</p>
+            <a href="create-listing.php" class="btn btn-green" style="width:100%;font-size:13px;">+ Post a Listing</a>
         </div>
         <?php endif; ?>
 
-        <h3>Categories</h3>
-        <?php
-        $cat_icons = [
-            'Clothing'         => '👕',
-            'Electronics'      => '📱',
-            'Food & Groceries' => '🛒',
-            'Furniture'        => '🪑',
-            'Tools'            => '🔧',
-            'Vehicles'         => '🚗',
-            'Services'         => '💼',
-            'Other'            => '📦',
-        ];
-        ?>
+        <h4>Categories</h4>
         <ul class="mz-sidebar-cats">
+            <li><a href="browse.php">All Listings</a></li>
+            <?php while ($cat = mysqli_fetch_assoc($categories_nav)): ?>
             <li>
-                <a href="browse.php">
-                    <span class="cat-icon">🏷️</span> All Listings
-                </a>
-            </li>
-            <?php while ($pill = mysqli_fetch_assoc($categories_nav)):
-                $icon = $cat_icons[$pill['name']] ?? '📦';
-            ?>
-            <li>
-                <a href="browse.php?category=<?= $pill['id'] ?>">
-                    <span class="cat-icon"><?= $icon ?></span>
-                    <?= htmlspecialchars($pill['name']) ?>
+                <a href="browse.php?category=<?= $cat['id'] ?>">
+                    <?= htmlspecialchars($cat['name']) ?>
                 </a>
             </li>
             <?php endwhile; ?>
@@ -459,11 +347,10 @@ include 'includes/header.php';
         </div>
 
         <?php if (mysqli_num_rows($featured) === 0): ?>
-            <div style="background:white;border:1px solid var(--gray-200);border-radius:12px;
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:5px;
                         padding:48px 24px;text-align:center;color:var(--gray-400);">
-                <div style="font-size:36px;margin-bottom:10px;">🛍️</div>
-                <p style="font-size:15px;font-weight:700;color:var(--gray-700);margin-bottom:5px;">No listings yet</p>
-                <p style="font-size:13px;margin-bottom:14px;">Be the first to post something for sale!</p>
+                <p style="font-size:15px;font-weight:600;color:var(--gray-700);margin-bottom:6px;">No listings yet</p>
+                <p style="font-size:13px;margin-bottom:14px;">Be the first to post something for sale.</p>
                 <?php if (isLoggedIn() && isSeller()): ?>
                     <a href="create-listing.php" class="btn btn-green">Post a Listing</a>
                 <?php else: ?>
@@ -479,15 +366,13 @@ include 'includes/header.php';
                              src="<?= htmlspecialchars($p['image']) ?>"
                              alt="<?= htmlspecialchars($p['title']) ?>">
                     <?php else: ?>
-                        <div class="mz-card-no-img">
-                            <?= $cat_icons[$p['category_name']] ?? '🛍️' ?>
-                        </div>
+                        <div class="mz-card-no-img">No image</div>
                     <?php endif; ?>
                     <div class="mz-card-body">
                         <h3><?= htmlspecialchars($p['title']) ?></h3>
                         <div class="mz-card-price">R <?= number_format($p['price'], 2) ?></div>
                         <div class="mz-card-meta">
-                            <span>📍 <?= htmlspecialchars($p['location'] ?: 'SA') ?></span>
+                            <span><?= htmlspecialchars($p['location'] ?: 'SA') ?></span>
                             <span><?= htmlspecialchars($p['username']) ?></span>
                         </div>
                     </div>
@@ -498,12 +383,13 @@ include 'includes/header.php';
 
         <?php if (!isLoggedIn()): ?>
         <div class="mz-cta">
-            <h3>Ready to start?</h3>
-            <p>Register free and reach buyers across South Africa in minutes.</p>
-            <div class="flex-row" style="justify-content:center;">
+            <div class="mz-cta-text">
+                <h3>Start selling today</h3>
+                <p>Register free and reach buyers across South Africa.</p>
+            </div>
+            <div class="mz-cta-actions">
                 <a href="register.php" class="btn btn-yellow btn-lg">Register Free</a>
-                <a href="login.php"
-                   style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;">Log in →</a>
+                <a href="login.php" class="secondary">Log in &rarr;</a>
             </div>
         </div>
         <?php endif; ?>
