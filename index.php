@@ -1,9 +1,14 @@
-<?php
-session_start();
-require_once 'config.php';
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
+<?php /* decided to use php instead of html due to it being better for web based e-commerce sites. And I mean that is what MyMarket-ZA is.
+/* Started adding these comments as I started. So much to learn about php, javaScript, css and all that. Hopefully helps someone else also, and well me when I go through it all again (btw, YouTube is AWESOME as a tool to learn)
+/* (and well CoPilot is pretty cool with also just simply making comments and explaining things)m */
+session_start(); 
 
+/* these reference other files, which is so much better than having everything in one */
+require_once 'config.php';
+require_once 'includes/db.php'; /* important to connect to database... which is obviously important, otherwise no database access */
+require_once 'includes/auth.php'; /* security features and stuff can be found here, and login and so on. */
+
+/* main landing page */
 $featured   = mysqli_query($conn, "
     SELECT p.*, u.username, c.name AS category_name
     FROM products p
@@ -165,7 +170,7 @@ include 'includes/header.php';
     align-items: start;
 }
 
-/* ---- SIDEBAR ---- */
+/* --SIDEBAR-- */
 .mz-sidebar h4 {
     font-size: 10px;
     font-weight: 700;

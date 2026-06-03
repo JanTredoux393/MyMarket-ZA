@@ -1,6 +1,4 @@
 <?php
-// Authentication helpers - included on pages that need login/role checks
-// Always call session_start() before including this file
 
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
