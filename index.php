@@ -413,7 +413,7 @@ include 'includes/header.php';
         </div>
         <?php endif; ?>
 
-        <h4>Categories</h4>
+        <h3>Categories</h3>
         <?php
         $cat_icons = [
             'Clothing'         => '👕',
