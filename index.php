@@ -312,7 +312,7 @@ include 'includes/header.php';
 
 <div class="mz-hero">
     <div class="mz-hero-inner">
-        <h1>Buy &amp; sell<br><em>anything.</em></h1>
+        <h1>YOUR market<br><em>Anything, Anywhere!</em></h1>
         <p>A community marketplace for South Africans. No fees, no middlemen — direct deals between real people.</p>
         <form method="GET" action="browse.php" style="margin:0;">
             <div class="mz-hero-searchbar">
