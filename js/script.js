@@ -89,25 +89,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-// Smooth page transitions — fade out before navigating
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('a').forEach(function (link) {
-        // Only apply to same-site links, skip external, hash, and javascript links
-        link.addEventListener('click', function (e) {
-            var href = link.getAttribute('href');
-            if (!href || href.startsWith('#') || href.startsWith('javascript')
-                || href.startsWith('http') || href.startsWith('mailto')
-                || link.target === '_blank') return;
-
-            e.preventDefault();
-            document.body.style.opacity = '0';
-            document.body.style.transform = 'translateY(6px)';
-            document.body.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-
-            setTimeout(function () {
-                window.location = href;
-            }, 150);
-        });
-    });
-});
