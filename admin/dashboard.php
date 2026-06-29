@@ -10,6 +10,7 @@ $total_users    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n F
 $total_products = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM products"))['n'];
 $total_messages = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM messages"))['n'];
 $total_sellers  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM users WHERE role='seller'"))['n'];
+$total_orders   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM orders"))['n'];
 
 $recent = mysqli_query($conn, "
     SELECT p.id, p.title, p.price, p.created_at, u.username
@@ -28,81 +29,28 @@ $recent = mysqli_query($conn, "
 <body>
 
 <style>
-    .admin-topbar {
-        background: linear-gradient(135deg, #052e16 0%, #14532d 50%, #166534 100%);
-        color: white;
-        padding: 0 24px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .admin-topbar-inner {
-        max-width: 1100px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 64px;
-        gap: 16px;
-    }
-
-    .admin-topbar-brand {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        white-space: nowrap;
-        color: white;
-        text-decoration: none;
-        flex-shrink: 0;
-    }
-
-    .admin-topbar-brand span { color: var(--gold); }
-
-    .admin-topbar nav {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        flex-wrap: wrap;
-    }
-
-    .admin-topbar nav a {
-        color: rgba(255,255,255,0.8);
-        font-size: 13px;
-        font-weight: 500;
-        padding: 6px 12px;
-        border-radius: 5px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background 0.15s, color 0.15s;
-    }
-
-    .admin-topbar nav a:hover { background: rgba(255,255,255,0.15); color: white; }
-    .admin-topbar nav a.active { background: var(--gold); color: #14532d; font-weight: 700; }
-    .admin-topbar nav a.nav-viewsite { border: 1px solid rgba(255,255,255,0.35); }
-
-    @media (max-width: 640px) {
-        .admin-topbar { padding: 0 16px; }
-
-        .admin-topbar-inner {
-            height: auto;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 12px 0;
-            gap: 10px;
-        }
-
-        .admin-topbar nav {
-            width: 100%;
-            gap: 4px;
-        }
-
-        .admin-topbar nav a {
-            font-size: 12px;
-            padding: 6px 10px;
-        }
-    }
+.admin-topbar {
+    background: linear-gradient(135deg,#052e16 0%,#14532d 50%,#166534 100%);
+    color:white;padding:0 24px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);position:sticky;top:0;z-index:100;
+}
+.admin-topbar-inner {
+    max-width:1100px;margin:0 auto;display:flex;align-items:center;
+    justify-content:space-between;height:64px;gap:16px;
+}
+.admin-topbar-brand {
+    font-size:20px;font-weight:800;letter-spacing:-0.5px;
+    white-space:nowrap;color:white;text-decoration:none;flex-shrink:0;
+}
+.admin-topbar nav {display:flex;align-items:center;gap:2px;flex-wrap:wrap;}
+.admin-topbar nav a {
+    color:rgba(255,255,255,0.8);font-size:13px;font-weight:500;
+    padding:6px 12px;border-radius:5px;text-decoration:none;
+    white-space:nowrap;transition:background 0.15s,color 0.15s;
+}
+.admin-topbar nav a:hover {background:rgba(255,255,255,0.15);color:white;}
+.admin-topbar nav a.active {background:var(--gold);color:#14532d;font-weight:700;}
+.admin-topbar nav a.nav-viewsite {border:1px solid rgba(255,255,255,0.35);}
 </style>
 
 <div class="admin-topbar">
@@ -112,6 +60,7 @@ $recent = mysqli_query($conn, "
             <a href="dashboard.php" class="active">Dashboard</a>
             <a href="users.php">Users</a>
             <a href="products.php">Listings</a>
+            <a href="add_balance.php">💳 Demo Funds</a>
             <a href="../browse.php" class="nav-viewsite" target="_blank">View Site ↗</a>
             <a href="../logout.php">Logout</a>
         </nav>
@@ -135,25 +84,28 @@ $recent = mysqli_query($conn, "
             <div class="stat-label">Listings</div>
         </div>
         <div class="stat-card">
+            <div class="stat-number"><?= $total_orders ?></div>
+            <div class="stat-label">Orders</div>
+        </div>
+        <div class="stat-card">
             <div class="stat-number"><?= $total_messages ?></div>
-            <div class="stat-label">Messages Sent</div>
+            <div class="stat-label">Messages</div>
         </div>
     </div>
 
     <h3 style="margin-bottom:12px;color:var(--green);">Recent Listings</h3>
-
     <div style="overflow-x:auto;">
         <table>
             <tr>
-                <th>Title</th>
-                <th>Seller</th>
-                <th>Price</th>
-                <th>Date</th>
-                <th>Action</th>
+                <th>Title</th><th>Seller</th><th>Price</th><th>Date</th><th>Action</th>
             </tr>
             <?php while ($r = mysqli_fetch_assoc($recent)): ?>
             <tr>
-                <td><a href="../product-details.php?id=<?= $r['id'] ?>"><?= htmlspecialchars($r['title']) ?></a></td>
+                <td>
+                    <a href="../product-details.php?id=<?= $r['id'] ?>">
+                        <?= htmlspecialchars($r['title']) ?>
+                    </a>
+                </td>
                 <td><?= htmlspecialchars($r['username']) ?></td>
                 <td>R <?= number_format($r['price'], 2) ?></td>
                 <td><?= date('d M Y', strtotime($r['created_at'])) ?></td>
