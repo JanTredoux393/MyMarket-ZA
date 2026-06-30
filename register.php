@@ -4,7 +4,6 @@ require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-// Already logged in - no need to register
 if (isLoggedIn()) {
     header("Location: index.php");
     exit();
@@ -20,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm  = $_POST['confirm_password'];
     $role     = in_array($_POST['role'], ['buyer', 'seller']) ? $_POST['role'] : 'buyer';
 
-    // Basic validation
     if (!$username || !$email || !$password) {
         $error = "Please fill in all fields.";
     } elseif (strlen($username) < 3) {
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm) {
         $error = "Passwords do not match.";
     } else {
-        // Check if username or email already exists
         $check = mysqli_query($conn, "SELECT id FROM users WHERE email='$email' OR username='$username'");
         if (mysqli_num_rows($check) > 0) {
             $error = "That username or email is already in use.";

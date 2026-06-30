@@ -200,7 +200,6 @@ include 'includes/header.php';
 
             <?php if ($active_product && $active_other): ?>
 
-                <!-- Thread header: who you're talking to + item info -->
                 <div class="thread-header">
                     <div>
                         <div class="thread-header-title">

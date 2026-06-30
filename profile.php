@@ -29,7 +29,6 @@ $listing_count = mysqli_fetch_assoc(mysqli_query($conn,
 $success = '';
 $error   = '';
 
-// Handle settings update — only for own profile
 if ($is_own && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     $new_username = trim(mysqli_real_escape_string($conn, $_POST['username']));
     $new_email    = trim(mysqli_real_escape_string($conn, $_POST['email']));
@@ -37,7 +36,6 @@ if ($is_own && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_set
     $confirm      = $_POST['confirm_password'];
     $current_pass = $_POST['current_password'];
 
-    // Verify current password first
     $check = mysqli_fetch_assoc(mysqli_query($conn,
         "SELECT password FROM users WHERE id=$view_id"
     ));
@@ -53,7 +51,6 @@ if ($is_own && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_set
     } elseif ($new_password && $new_password !== $confirm) {
         $error = "New passwords do not match.";
     } else {
-        // Check username/email not taken by someone else
         $taken = mysqli_fetch_assoc(mysqli_query($conn,
             "SELECT id FROM users WHERE (username='$new_username' OR email='$new_email') AND id != $view_id"
         ));
@@ -66,10 +63,8 @@ if ($is_own && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_set
             } else {
                 mysqli_query($conn, "UPDATE users SET username='$new_username', email='$new_email' WHERE id=$view_id");
             }
-            // Update session username
             $_SESSION['username'] = $new_username;
             $success = "Settings updated successfully.";
-            // Refresh user data
             $user = mysqli_fetch_assoc(mysqli_query($conn,
                 "SELECT id, username, email, role, created_at FROM users WHERE id=$view_id"
             ));

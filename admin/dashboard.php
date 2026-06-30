@@ -60,8 +60,7 @@ $recent = mysqli_query($conn, "
             <a href="dashboard.php" class="active">Dashboard</a>
             <a href="users.php">Users</a>
             <a href="products.php">Listings</a>
-            <a href="add_balance.php">💳 Demo Funds</a>
-            <a href="../browse.php" class="nav-viewsite" target="_blank">View Site ↗</a>
+            <a href="../browse.php" class="nav-viewsite" target="_blank">View Site</a>
             <a href="../logout.php">Logout</a>
         </nav>
     </div>

@@ -8,7 +8,6 @@ requireLogin();
 
 $user_id = currentUserId();
 
-// Handle seller upgrade request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['seller_request'])) {
     mysqli_query($conn, "UPDATE users SET seller_request=1 WHERE id=$user_id");
     header("Location: my-listing.php?requested=1");
@@ -61,20 +60,18 @@ include 'includes/header.php';
             <?php while ($p = mysqli_fetch_assoc($listings)): ?>
             <div class="product-card">
                 <div>
-
                 <?php if (!empty($p['image'])): ?>
                     <img src="<?= htmlspecialchars($p['image']) ?>"
                          alt="<?= htmlspecialchars($p['title']) ?>"
                          style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
                 <?php endif; ?>
-
                     <h3><?= htmlspecialchars($p['title']) ?></h3>
                     <div class="price">R <?= number_format($p['price'], 2) ?></div>
                     <?php if ($p['category_name']): ?>
                         <div class="category"><?= htmlspecialchars($p['category_name']) ?></div>
                     <?php endif; ?>
                     <?php if ($p['location']): ?>
-                        <div class="location">📍 <?= htmlspecialchars($p['location']) ?></div>
+                        <div class="location"><?= htmlspecialchars($p['location']) ?></div>
                     <?php endif; ?>
                     <div class="location">Posted: <?= date('d M Y', strtotime($p['created_at'])) ?></div>
                 </div>

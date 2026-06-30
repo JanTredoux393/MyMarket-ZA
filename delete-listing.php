@@ -19,16 +19,13 @@ if (!$product) {
     exit();
 }
 
-// Only the owner or an admin can delete
 if (currentUserId() !== $product['user_id'] && !isAdmin()) {
     header("Location: browse.php");
     exit();
 }
 
-// Delete the listing
 mysqli_query($conn, "DELETE FROM products WHERE id=$id");
 
-// Send user back to their listings or admin panel
 if (isAdmin() && strpos($_SERVER['HTTP_REFERER'] ?? '', 'admin') !== false) {
     header("Location: admin/products.php?deleted=1");
 } else {

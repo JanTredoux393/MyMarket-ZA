@@ -6,7 +6,6 @@ require_once 'includes/auth.php';
 
 requireLogin();
 
-// Only sellers and admins can create listings
 if (!isSeller()) {
     header("Location: profile.php?error=notseller");
     exit();
@@ -23,40 +22,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cat_id   = (int)$_POST['category_id'];
     $stock    = max(1, (int)$_POST['stock']);
     $user_id  = currentUserId();
-    $image    = ''; // will be filled in below if a file was uploaded
-
-    // --- Handle the uploaded image file ---
-    // $_FILES['image'] contains info about the file the user chose
+    $image    = ''; 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 
-        // Get the file extension (e.g. "jpg", "png")
         $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
 
-        // Only allow safe image types
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array($ext, $allowed)) {
             $error = "Only JPG, PNG, GIF or WEBP images are allowed.";
         } else {
-            // Create the uploads folder if it doesn't exist yet
             if (!is_dir('uploads')) {
                 mkdir('uploads', 0755, true);
             }
 
-            // Give the file a unique name so two people can upload "photo.jpg"
-            // without overwriting each other. uniqid() makes a random string.
             $filename = uniqid('img_') . '.' . $ext;
             $savepath = 'uploads/' . $filename;
 
-            // Move the file from the temporary folder PHP put it in
-            // to our uploads folder
             if (move_uploaded_file($_FILES['image']['tmp_name'], $savepath)) {
-                $image = $savepath; // save the path to put in the database
+                $image = $savepath; 
             } else {
                 $error = "Image upload failed. Please try again.";
             }
         }
     }
-    // --- End image handling ---
 
     if (!$error) {
         if (!$title) {
@@ -89,10 +77,6 @@ include 'includes/header.php';
 
     <div class="profile-box">
 
-        <!--
-            enctype="multipart/form-data" is REQUIRED when a form uploads files.
-            Without it, PHP will never receive the image.
-        -->
         <form method="POST" action="create-listing.php" id="listing-form" enctype="multipart/form-data">
 
             <label for="title">Title *</label>
@@ -131,12 +115,10 @@ include 'includes/header.php';
                       placeholder="Describe your item — condition, size, colour, reason for selling..."><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
             <small id="desc-counter" style="color:#888;font-size:12px;display:block;margin-top:-10px;margin-bottom:12px;"></small>
 
-            <!-- Image upload — type="file" gives the user a proper browse button -->
             <label for="image">Product Image <span style="font-weight:400;text-transform:none;font-size:12px;color:var(--gray-400);">(optional — JPG, PNG, GIF or WEBP)</span></label>
             <div class="image-upload-box">
                 <input type="file" id="image" name="image" accept="image/*">
                 <p class="image-upload-hint">Click to choose an image from your device</p>
-                <!-- Preview: shows the chosen image before submitting -->
                 <img id="image-preview" src="" alt="Preview" style="display:none;">
             </div>
 
@@ -150,17 +132,14 @@ include 'includes/header.php';
 </div>
 
 <script>
-    // Character counter for the description box
     charCounter('description', 'desc-counter', 1000);
 
-    // Image preview — when the user picks a file, show it above the button
     document.getElementById('image').addEventListener('change', function () {
         var preview = document.getElementById('image-preview');
         var hint    = document.querySelector('.image-upload-hint');
-        var file    = this.files[0]; // the file they chose
+        var file    = this.files[0]; 
 
         if (file) {
-            // FileReader reads the file and gives us a URL we can put in <img src="">
             var reader = new FileReader();
             reader.onload = function (e) {
                 preview.src     = e.target.result;
