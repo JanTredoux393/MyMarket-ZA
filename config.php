@@ -6,7 +6,7 @@ error_reporting(0);
 define('SITE_NAME', 'MyMarket-ZA');
 define('SITE_URL', 'http://mymarket-za.great-site.net');
 define('DB_HOST', 'sql313.infinityfree.com');        
-define('DB_USER', 'if0_42297008');    
+define('DB_USER', '');    
 define('DB_PASS', '');   
-define('DB_NAME', 'if0_42297008_mymarket_za');   
+define('DB_NAME', '');   
 ?>
